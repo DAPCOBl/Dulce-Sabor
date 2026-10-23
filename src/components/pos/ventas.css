@@ -1,0 +1,244 @@
+/* ================= POS · Ventas del turno =================
+   Solo lo que es propio de esta pantalla. Las migas, la cabecera, las
+   tarjetas KPI, el buscador, la tabla, los estados vacíos y los avisos
+   vienen de components/ui/ui.css.
+   ------------------------------------------------------------------ */
+
+.ventas {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 18px;
+  max-height: 100svh;
+  padding: 26px;
+  overflow-y: auto;
+}
+
+/* ---------- Listado ---------- */
+
+.ventas__listado {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  overflow: hidden;
+}
+
+.ventas__filtros {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ventas__filtros .ui__buscador {
+  flex: 1;
+  max-width: 340px;
+}
+
+.ventas__tabs {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.ventas__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition: all 0.2s;
+}
+
+.ventas__tab:hover {
+  border-color: var(--toasted);
+  color: var(--ink);
+}
+
+.ventas__tab--activo {
+  border-color: var(--terracotta);
+  background: color-mix(in srgb, var(--terracotta) 10%, transparent);
+  color: var(--terracotta);
+}
+
+.ventas__tab-cuenta {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--cream-soft);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.ventas__tab--activo .ventas__tab-cuenta {
+  background: var(--terracotta);
+  color: var(--white);
+}
+
+/* ---------- Tabla ---------- */
+
+.ventas__col-importe,
+.ventas__importe {
+  text-align: right;
+}
+
+.ventas__col-acciones {
+  text-align: right;
+}
+
+.ui__tabla thead th.ventas__col-importe,
+.ui__tabla thead th.ventas__col-acciones {
+  text-align: right;
+}
+
+.ventas__hora {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.ventas__folio {
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.ventas__metodo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--cream-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--toasted);
+  white-space: nowrap;
+}
+
+.ventas__metodo--tarjeta {
+  background: color-mix(in srgb, var(--info) 12%, transparent);
+  color: var(--info);
+}
+
+.ventas__importe {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ventas__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.ventas__accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--white);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ventas__accion:hover {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
+}
+
+/* ---------- Pie de tabla ---------- */
+
+.ventas__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--cream);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.ventas__total {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.ventas__total strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1180px) {
+  .ui__tabla thead th,
+  .ui__tabla td {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 860px) {
+  .ventas__accion-texto {
+    display: none;
+  }
+
+  .ventas__accion {
+    width: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 820px) {
+  .ventas {
+    padding: 20px;
+  }
+
+  .ventas__filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ventas__filtros .ui__buscador {
+    max-width: none;
+  }
+
+  .ventas__tabs {
+    margin-left: 0;
+  }
+
+  .ventas__pie {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

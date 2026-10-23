@@ -1,0 +1,379 @@
+/* ================= ADMIN · Módulo de productos ================= */
+
+.admin__principal:has(.admin__productos) {
+  max-width: 1680px;
+}
+
+.admin__productos {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---------- Metadatos del catálogo ---------- */
+
+.admin__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--white);
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+.admin__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin__meta-item i {
+  color: var(--terracotta);
+}
+
+.admin__meta-item--filtro {
+  font-weight: 600;
+  color: var(--terracotta);
+}
+
+.admin__meta-separador {
+  width: 1px;
+  height: 16px;
+  background: var(--line);
+}
+
+/* ---------- Estructura tabla + panel ---------- */
+
+.admin__productos-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+/* ---------- Filtros ---------- */
+
+.admin__limpiar {
+  margin-left: auto;
+  padding: 8px 4px;
+  border: none;
+  background: transparent;
+}
+.admin__limpiar:disabled {
+  color: var(--placeholder);
+  cursor: default;
+  text-decoration: none;
+}
+
+.admin__limpiar:disabled:hover {
+  color: var(--placeholder);
+}
+
+/* ---------- Tabla del catálogo ---------- */
+
+.admin__catalogo {
+  gap: 16px;
+  padding: 18px;
+}
+
+/* La tabla de productos es más compacta que la de ventas para que las ocho
+   columnas quepan sin scroll horizontal en el ancho de la pantalla. */
+.ui__tabla--productos thead th,
+.ui__tabla--productos tbody td {
+  padding: 12px 13px;
+}
+
+.ui__tabla--productos tbody tr:hover {
+  background: color-mix(in srgb, var(--cream) 55%, transparent);
+}
+
+.admin__sku {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.admin__producto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 140px;
+}
+
+.admin__producto-nombre {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.admin__celda-suave {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.admin__unidad {
+  display: inline-flex;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--cream-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--toasted);
+  white-space: nowrap;
+}
+
+.admin__col-precio {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.admin__precio {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.admin__estado.admin__estado--inactivo {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
+}
+
+.admin__col-acciones {
+  width: 126px;
+  text-align: right;
+}
+
+.admin__acciones-fila {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin__accion {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-soft);
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.admin__accion:hover {
+  border-color: var(--line);
+  background: var(--cream);
+  color: var(--terracotta);
+}
+
+.admin__accion--desactivar:hover {
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
+
+.admin__accion--activar:hover {
+  border-color: color-mix(in srgb, var(--success-text) 35%, transparent);
+  background: color-mix(in srgb, var(--success-text) 10%, transparent);
+  color: var(--success-text);
+}
+
+/* ---------- Paginación ---------- */
+
+.admin__paginacion {
+  padding-top: 4px;
+}
+
+/* ---------- Ficha del producto ---------- */
+
+.admin__panel-cuerpo {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  padding: 18px 20px;
+  overflow-y: auto;
+}
+
+.admin__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.admin__campo-par {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin__campo-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.admin__input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin__input:focus {
+  outline: none;
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--terracotta) 14%, transparent);
+}
+
+.admin__input:disabled {
+  background: var(--cream);
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+.admin__input--error {
+  border-color: var(--danger);
+}
+
+.admin__input--error:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent);
+}
+
+.admin__input--sku {
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.admin__input-monto {
+  position: relative;
+}
+
+.admin__input-prefijo {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+
+.admin__input--precio {
+  padding-left: 26px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin__select-editor {
+  padding-right: 38px;
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239A4A34' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.admin__campo-error {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+/* ---------- Aviso de existencias ---------- */
+
+.admin__aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--info) 26%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--info) 8%, transparent);
+}
+
+.admin__aviso-icono {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--info) 14%, transparent);
+  color: var(--info);
+}
+
+.admin__aviso-titulo {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.admin__aviso-texto {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ---------- Acciones de la ficha ---------- */
+
+.admin__panel-acciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin__guardado {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--success-text) 10%, transparent);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--success-text);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 860px) {
+  .ui__filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ui__buscador {
+    min-width: 0;
+  }
+
+  .admin__limpiar {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+}

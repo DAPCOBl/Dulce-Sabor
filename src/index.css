@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Clarity+City:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --cream: #F6F3ED;
+  --cream-soft: #F6F3ED;
+  --white: #FFFEFB;
+  --ivory: #FFFEFB;
+  --ink: #302A25;
+  --ink-soft: #786E65;
+  --secondary: #786E65;
+  --toasted: #9A4A34;
+  --terracotta: #9A4A34;
+  --terracotta-dark: #813728;
+  --line: #E6DED4;
+  --border: #E6DED4;
+  --danger: #A74335;
+  --error: #A74335;
+
+  /* Tonos derivados (usar color-mix para los fondos suaves) */
+  --success-bright: #3C8C5A;
+  --success-text: #2F7D52;
+  --warning-base: #D7A528;
+  --warning-text: #9A6F10;
+  --warning-strong: #8A6410;
+  --info: #3B5F92;
+  --placeholder: #B3A596;
+  --brand-brown: #4A2F22;
+  --brand-shadow: #2B1D16;
+
+  --font: 'Clarity City', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Clarity City', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  color-scheme: light;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--cream);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: var(--terracotta);
+}

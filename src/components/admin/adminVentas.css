@@ -1,0 +1,222 @@
+/* ================= ADMIN · Ventas de la sede =================
+   Solo lo que es propio de esta pantalla. Los botones, las tarjetas KPI,
+   el buscador, los filtros, la tabla, la paginación, los estados vacíos,
+   los modales y los avisos vienen de components/ui/ui.css.
+   ------------------------------------------------------------------ */
+
+.admin__ventas {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ---------- Cintillo de metadatos ---------- */
+
+.admin__meta-sede {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 9px;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.admin__meta-sede i {
+  color: var(--terracotta);
+}
+
+/* ---------- Listado ---------- */
+
+.admin__listado {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--white);
+  overflow: hidden;
+}
+
+.admin__listado-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px 18px;
+}
+
+.admin__listado-titulo {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.admin__listado-sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.admin__listado-alcance {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--cream-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.admin__listado-total {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.admin__listado-total strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ---------- Filtros ---------- */
+
+.admin__listado .ui__filtros {
+  padding: 0 22px 18px;
+}
+
+/* ---------- Tabla ---------- */
+
+.ui__tabla--ventas thead th {
+  padding: 13px 22px;
+}
+
+.ui__tabla--ventas td {
+  padding: 15px 22px;
+}
+
+.admin__col-acciones {
+  text-align: right;
+}
+
+.ui__tabla--ventas thead th.admin__col-acciones {
+  text-align: right;
+}
+
+.admin__cajero-celda {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin__cajero-nombre {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.admin__cajero-detalle {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.admin__estado.admin__estado--pendiente {
+  background: color-mix(in srgb, var(--warning-base) 18%, transparent);
+  color: var(--warning-strong);
+}
+
+.admin__acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.admin__accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--white);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.admin__accion:hover {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
+}
+
+.admin__accion-icono {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--white);
+  color: var(--ink-soft);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.admin__accion-icono:hover {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
+}
+
+/* ---------- Pie del listado ---------- */
+
+.admin__listado-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+  background: var(--cream);
+}
+
+/* ---------- Nota de prototipo ---------- */
+
+.admin__nota {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 4px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.admin__nota strong {
+  color: var(--ink);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1080px) {
+  .admin__listado-cabecera,
+  .admin__listado-pie {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

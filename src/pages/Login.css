@@ -1,0 +1,324 @@
+.login {
+  display: flex;
+  min-height: 100svh;
+  background: var(--cream);
+}
+
+/* ---------- Columna izquierda: marca ---------- */
+
+.brand {
+  position: relative;
+  flex: 0 0 45%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 44px 48px;
+  overflow: hidden;
+  color: var(--white);
+  text-align: left;
+  background-color: var(--brand-brown);
+  background-image:
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-shadow) 55%, transparent) 0%, color-mix(in srgb, var(--brand-shadow) 15%, transparent) 38%, color-mix(in srgb, var(--brand-shadow) 85%, transparent) 100%),
+    url('banners/bakery.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.brand__logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand__mark {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.brand__name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.brand__tagline {
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.brand__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  max-width: 540px;
+}
+
+.brand__badge {
+  padding: 6px 14px;
+  border: 1px solid color-mix(in srgb, var(--white) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--white) 12%, transparent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  backdrop-filter: blur(2px);
+}
+
+.brand__headline {
+  font-family: var(--font-display);
+  font-size: 46px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--white);
+}
+
+/* ---------- Columna derecha: formulario ---------- */
+
+.login__panel {
+  flex: 1 1 55%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 48px 32px 28px;
+  background: var(--cream);
+}
+
+.login__inner {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login__header {
+  margin-bottom: 32px;
+}
+
+.login__title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.login__subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.login__footer {
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  color: var(--ink-soft);
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+
+/* ---------- Formulario ---------- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form__control input {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--ivory);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form__control input::placeholder {
+  color: var(--secondary);
+  opacity: 0.7;
+}
+
+.form__control input:focus {
+  outline: none;
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--terracotta) 15%, transparent);
+}
+
+.form__control--error input {
+  border-color: var(--error);
+}
+
+.form__icon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  color: var(--toasted);
+  pointer-events: none;
+}
+
+.form__icon i {
+  font-size: 18px;
+}
+
+.form__toggle {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--toasted);
+  transition: background 0.2s, color 0.2s;
+}
+
+.form__toggle:hover {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.form__toggle i {
+  font-size: 18px;
+}
+
+.form__error {
+  font-size: 11px;
+  color: var(--error);
+}
+
+.form__options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.form__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.form__checkbox input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--terracotta);
+  cursor: pointer;
+}
+
+.form__link {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--terracotta);
+  text-decoration: none;
+}
+
+.form__link:hover {
+  text-decoration: underline;
+}
+
+.form__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 50px;
+  margin-top: 4px;
+  border: none;
+  border-radius: 12px;
+  background: var(--terracotta);
+  color: var(--ivory);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.form__submit:hover {
+  background: var(--terracotta-dark);
+}
+
+.form__submit:active {
+  transform: translateY(1px);
+}
+
+.form__submit:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
+.form__submit i {
+  font-size: 18px;
+}
+
+.form__error--general {
+  text-align: center;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .login {
+    flex-direction: column;
+  }
+
+  .brand {
+    flex: none;
+    min-height: 300px;
+    padding: 28px 24px;
+  }
+
+  .brand__headline {
+    font-size: 28px;
+  }
+
+  .login__panel {
+    flex: 1;
+    padding: 36px 24px 24px;
+    gap: 28px;
+  }
+
+  .login__title {
+    font-size: 32px;
+  }
+}
