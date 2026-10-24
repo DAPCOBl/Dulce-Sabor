@@ -21,6 +21,8 @@ function valoresIniciales(producto) {
       coste: '',
       stockMinimo: '',
       estado: 'Activo',
+       imagen: '',
+
     }
   }
 
@@ -32,6 +34,8 @@ function valoresIniciales(producto) {
     coste: String(producto.coste ?? 0),
     stockMinimo: String(producto.stockMinimo),
     estado: producto.estado,
+     imagen: producto.imagen ?? '',
+
   }
 }
 
@@ -64,6 +68,17 @@ function ProductoEditor({
     setErrores((actual) => ({ ...actual, [campo]: undefined }))
   }
 
+  function subirImagen(evento) {
+    const archivo = evento.target.files?.[0]
+    if (!archivo) return
+    const lector = new FileReader()
+    lector.onload = () => {
+      actualizar('imagen', String(lector.result ?? ''))
+    }
+    lector.readAsDataURL(archivo)
+  }
+
+
   function cambiarCategoria(categoria) {
     setForm((actual) => {
       // La unidad acompaña a la categoría, salvo que el usuario ya la haya
@@ -75,6 +90,7 @@ function ProductoEditor({
         ...actual,
         categoria,
         unidad,
+
         sku: skuEditado ? actual.sku : generarSku(categoria),
       }
     })
@@ -99,6 +115,8 @@ function ProductoEditor({
     if (!Number.isInteger(Number(form.stockMinimo)) || Number(form.stockMinimo) < 0) {
       fallos.stockMinimo = 'Escribe un número entero válido.'
     }
+     if (!form.imagen) fallos.imagen = 'Selecciona una imagen para el producto.'
+
 
     return fallos
   }
@@ -118,6 +136,8 @@ function ProductoEditor({
       coste: Number(form.coste),
       stockMinimo: Number(form.stockMinimo),
       estado: form.estado,
+       imagen: form.imagen,
+
     })
 
     if (ok) setGuardado(true)
@@ -152,7 +172,7 @@ function ProductoEditor({
       onCerrar={onCerrar}
       titulo={TITULOS[modo]}
       subtitulo={producto ? producto.sku : 'Datos del catálogo'}
-      lateral
+       ancho
       acciones={
         <>
           {guardado && <p className="admin__guardado">Cambios guardados en el catálogo.</p>}
@@ -256,6 +276,44 @@ function ProductoEditor({
             </select>
           </div>
         </div>
+         <div className="admin__campo">
+           <label className="admin__campo-label" htmlFor="producto-imagen">
+             Imagen (obligatoria)
+           </label>
+            <div className={`admin__imagen-carga${errores.imagen ? ' admin__imagen-carga--error' : ''}${soloLectura ? ' admin__imagen-carga--deshabilitada' : ''}`}>
+              <input
+                id="producto-imagen"
+                className="admin__imagen-input"
+                type="file"
+                accept="image/*"
+                onChange={subirImagen}
+                disabled={soloLectura}
+                aria-invalid={Boolean(errores.imagen)}
+              />
+              <label htmlFor="producto-imagen" className="admin__imagen-etiqueta">
+                {form.imagen ? (
+                  <img src={form.imagen} alt="" className="admin__imagen-preview" />
+                ) : (
+                  <span className="admin__imagen-placeholder" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="3" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <path d="M21 15l-5-5L5 21" />
+                    </svg>
+                  </span>
+                )}
+                <span className="admin__imagen-texto">
+                  {form.imagen ? 'Cambiar imagen' : 'Seleccionar imagen'}
+                </span>
+                <span className="admin__imagen-ayuda">
+                  {form.imagen ? 'Imagen cargada correctamente.' : 'JPG, PNG o WebP. Obligatoria.'}
+                </span>
+              </label>
+            </div>
+
+           {errores.imagen && <p className="admin__campo-error">{errores.imagen}</p>}
+         </div>
+
 
         <div className="admin__campo-par">
           <div className="admin__campo">

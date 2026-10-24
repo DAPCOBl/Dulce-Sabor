@@ -1,6 +1,3 @@
-import { IconoProducto } from '../ui/ProductoThumb'
-import { IconPlus } from '../ui/icons'
-
 function ProductoCard({ producto, onAdd }) {
   const agotado = producto.stock <= 0
   const bajo = !agotado && producto.stock <= producto.stockMinimo
@@ -14,11 +11,7 @@ function ProductoCard({ producto, onAdd }) {
   return (
     <article className={`producto${agotado ? ' producto--agotado' : ''}`}>
       <div className="producto__imagen">
-        {producto.imagen ? (
-          <img className="producto__foto" src={producto.imagen} alt={producto.nombre} loading="lazy" />
-        ) : (
-          <IconoProducto categoria={producto.categoria} width="44" height="44" />
-        )}
+        <img className="producto__foto" src={producto.imagen} alt={producto.nombre} loading="lazy" />
       </div>
 
       <div className="producto__info">
@@ -38,7 +31,7 @@ function ProductoCard({ producto, onAdd }) {
         disabled={agotado}
         aria-label={agotado ? `${producto.nombre} agotado` : `Agregar ${producto.nombre}`}
       >
-        {agotado ? 'No disponible' : <IconPlus width="18" height="18" />}
+        {agotado ? 'No disponible' : '+'}
       </button>
     </article>
   )

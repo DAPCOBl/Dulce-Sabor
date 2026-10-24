@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import PosSidebar from '../../components/pos/PosSidebar'
 import AdminProductos from './AdminProductos'
+import AdminUsuarios from '../../components/admin/AdminUsuarios'
+import AdminReportes from '../../components/admin/AdminReportes'
 import AdminVentas from '../../components/admin/AdminVentas'
 import AlertasInventario from '../../components/admin/AlertasInventario'
 import BalanceMes from '../../components/admin/BalanceMes'
@@ -12,26 +14,21 @@ import Kpi from '../../components/ui/Kpi'
 import '../../components/pos/pos.css'
 import {
   IconArrow,
-  IconCalendar,
-  IconExport,
   IconSales,
   IconTendenciaUp,
 } from '../../components/ui/icons'
 import { SECCIONES } from '../../components/admin/secciones'
 import {
   diaCorto,
-  fechaDiaMes,
   isoFecha,
   moneda,
   primerNombre,
   porcentaje,
-  periodoMes,
   periodoMesAnteriorCorto,
   saludo,
 } from '../../components/ui/format'
 import {
   BALANCE_MES,
-  NOTIFICACIONES,
   RESUMEN_DIA,
   RESUMEN_MES,
   SERIE_SEMANAL,
@@ -39,23 +36,9 @@ import {
 import { alertasDeInventario, useEstado } from '../../services/estado'
 import '../../components/admin/admin.css'
 
-// La primera notificación de la campana se arma con el inventario real.
-function notificacionDeAlerta(alerta) {
-  if (!alerta) return null
-  const agotado = alerta.estado === 'agotado'
-  return {
-    id: `alerta-${alerta.id}`,
-    tipo: agotado ? 'alerta' : 'info',
-    titulo: agotado ? `${alerta.nombre} agotado` : `${alerta.nombre} con stock bajo`,
-    detalle: agotado
-      ? 'Sin unidades en stock · revisa el inventario'
-      : `Quedan ${alerta.stock} de ${alerta.minimo} unidades`,
-  }
-}
-
 function AdminHome({ session, onLogout }) {
   const [vista, setVista] = useState('resumen')
-  const [fecha, setFecha] = useState(() => new Date())
+  const [fecha] = useState(() => new Date())
   const [reloj, setReloj] = useState(() => new Date())
   const { ventas, productos, sesion } = useEstado()
 
@@ -70,7 +53,6 @@ function AdminHome({ session, onLogout }) {
   const ingresosHoy = RESUMEN_DIA.ingresos + sesion.ingresos
   const ventasHoy = RESUMEN_DIA.ventas + sesion.ventas
   const ingresosMes = RESUMEN_MES.ingresos + sesion.ingresos
-  const ticketMedio = ventasHoy > 0 ? ingresosHoy / ventasHoy : 0
 
   const serie = useMemo(() => {
     const valores = [...SERIE_SEMANAL, ingresosHoy]
@@ -96,51 +78,8 @@ function AdminHome({ session, onLogout }) {
   const agotados = alertas.filter((alerta) => alerta.estado === 'agotado').length
   const stockBajo = alertas.length - agotados
 
-  const notificaciones = useMemo(() => {
-    const dinamica = notificacionDeAlerta(alertas[0])
-    return dinamica ? [dinamica, ...NOTIFICACIONES] : NOTIFICACIONES
-  }, [alertas])
-
   const seccion = SECCIONES.find((item) => item.id === vista) ?? SECCIONES[0]
   const IconoSeccion = seccion.Icono
-
-  function cambiarFecha(evento) {
-    const valor = evento.target.value
-    if (!valor) return
-    setFecha(new Date(`${valor}T12:00:00`))
-  }
-
-  function exportarReporte() {
-    const filas = [
-      ['Dulce Sabor - Resumen del negocio'],
-      ['Sede', 'Sede principal'],
-      ['Fecha', fechaDiaMes(fecha)],
-      [],
-      ['Ingresos diarios'],
-      ['Dia', 'Ingresos'],
-      ...serie.map((punto) => [punto.etiqueta, punto.valor]),
-      ['Acumulado del periodo', totalSemana],
-      [],
-      ['Balance del mes', periodoMes(fecha)],
-      ['Concepto', 'Valor'],
-      ['Ingresos', balance.ingresos],
-      ['Costo de productos vendidos', balance.costoProductosVendidos],
-      ['Gastos operativos', balance.gastosOperativos],
-      [
-        'Utilidad estimada',
-        balance.ingresos - balance.costoProductosVendidos - balance.gastosOperativos,
-      ],
-    ]
-
-    const csv = filas.map((fila) => fila.join(';')).join('\n')
-    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const enlace = document.createElement('a')
-    enlace.href = url
-    enlace.download = `resumen-dulce-sabor-${isoFecha(fecha)}.csv`
-    enlace.click()
-    URL.revokeObjectURL(url)
-  }
 
   return (
     <div className="admin">
@@ -153,45 +92,27 @@ function AdminHome({ session, onLogout }) {
         menuTitulo="Administración"
         rolEtiqueta="Administrador"
         admin
+        link="/guia/administrador"
       />
 
       <div className="admin__cuerpo">
-        <main className="admin__principal" style={{ paddingTop: 16 }}>
+        <main className="admin__principal pos__centro">
           {vista === 'inventario' ? (
             <InventarioPanel session={session} />
           ) : vista === 'productos' ? (
             <AdminProductos />
+          ) : vista === 'usuarios' ? (
+            <AdminUsuarios session={session} />
           ) : vista === 'ventas' ? (
             <AdminVentas />
+          ) : vista === 'reportes' ? (
+            <AdminReportes />
           ) : vista === 'resumen' ? (
             <>
               <Cabecera
                 miga="Resumen del negocio"
                 titulo={`${saludo(reloj)}, ${primerNombre(session.user.nombre)}.`}
                   subtitulo="Resumen operativo y métricas clave de tu sede."
-                acciones={
-                  <>
-                    <label className="ui__boton ui__boton--secundario ui__fecha">
-                      <IconCalendar width="16" height="16" />
-                      {fechaDiaMes(fecha)}
-                      <input
-                        type="date"
-                        value={isoFecha(fecha)}
-                        onChange={cambiarFecha}
-                        aria-label="Seleccionar fecha del resumen"
-                      />
-                    </label>
-
-                    <button
-                      type="button"
-                      className="ui__boton ui__boton--primario"
-                      onClick={exportarReporte}
-                    >
-                      <IconExport width="16" height="16" />
-                      Exportar reporte
-                    </button>
-                  </>
-                }
               />
 
               <section className="ui__kpis ui__kpis--tres admin__kpis-resumen" aria-label="Indicadores del día">
@@ -204,8 +125,6 @@ function AdminHome({ session, onLogout }) {
                   meta={
                     <span className="admin__kpi-linea">
                       <strong>{ventasHoy}</strong> ventas
-                      <span className="admin__kpi-sep" aria-hidden="true">·</span>
-                      Ticket medio {moneda(ticketMedio)}
                     </span>
                   }
                 />

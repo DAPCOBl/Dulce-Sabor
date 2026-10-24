@@ -68,7 +68,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 14,
     stockMinimo: 6,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Croissant.png',
   },
   {
     id: 'i02',
@@ -81,7 +81,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 9,
     stockMinimo: 5,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Muffin de arandanos.png',
   },
   {
     id: 'i03',
@@ -94,7 +94,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 11,
     stockMinimo: 6,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Rol de canela.png',
   },
   {
     id: 'p7',
@@ -133,7 +133,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 7,
     stockMinimo: 4,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Tarta de Fresa.png',
   },
   {
     id: 'i05',
@@ -146,7 +146,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 12,
     stockMinimo: 5,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Torta de chocolate.png',
   },
   {
     id: 'i06',
@@ -159,7 +159,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 5,
     stockMinimo: 4,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Torta de chocolate.png',
   },
   {
     id: 'i07',
@@ -172,7 +172,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 16,
     stockMinimo: 6,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Croissant.png',
   },
   {
     id: 'i08',
@@ -185,7 +185,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 6,
     stockMinimo: 4,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Tarta de Fresa.png',
   },
   {
     id: 'i09',
@@ -198,7 +198,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 8,
     stockMinimo: 4,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Croissant.png',
   },
   {
     id: 'p25',
@@ -224,7 +224,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 13,
     stockMinimo: 6,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Capuchinno.png',
   },
   {
     id: 'i11',
@@ -237,7 +237,7 @@ export const PRODUCTOS_CATALOGO = [
     stock: 15,
     stockMinimo: 6,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Capuchinno.png',
   },
   {
     id: 'i12',
@@ -250,9 +250,30 @@ export const PRODUCTOS_CATALOGO = [
     stock: 9,
     stockMinimo: 6,
     estado: 'Activo',
-    imagen: null,
+    imagen: '/productos/Capuchinno.png',
   },
 ]
+
+// Imágenes disponibles en el catálogo. La imagen es obligatoria para todo
+// producto: si no se indica una, se usa la correspondiente a su categoría.
+export const IMAGENES_PRODUCTOS = [
+  '/productos/Capuchinno.png',
+  '/productos/Croissant.png',
+  '/productos/Muffin de arandanos.png',
+  '/productos/Rol de canela.png',
+  '/productos/Tarta de Fresa.png',
+  '/productos/Torta de chocolate.png',
+]
+
+export const IMAGEN_POR_CATEGORIA = {
+  'Pan dulce': '/productos/Croissant.png',
+  Pasteles: '/productos/Torta de chocolate.png',
+  Saldados: '/productos/Croissant.png',
+  Bebidas: '/productos/Capuchinno.png',
+}
+
+export const IMAGEN_PREDETERMINADA = '/productos/Croissant.png'
+
 
 export function prefijoDeCategoria(categoria) {
   return PREFIJOS[categoria] ?? 'PRD'

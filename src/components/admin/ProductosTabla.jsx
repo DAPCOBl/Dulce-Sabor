@@ -2,7 +2,7 @@ import Buscador from '../ui/Buscador'
 import Paginacion from '../ui/Paginacion'
 import Vacio from '../ui/Vacio'
 import { Select } from '../ui/Filtro'
-import { IconClose, IconDesactivar, IconEditar, IconVer } from '../ui/icons'
+import { IconClose, IconDesactivar, IconEditar } from '../ui/icons'
 import { moneda } from '../ui/format'
 
 const OPCIONES_CATEGORIA = [{ valor: '', etiqueta: 'Todas las categorías' }]
@@ -21,7 +21,6 @@ function ProductosTabla({
   hayFiltros,
   onFiltros,
   onPagina,
-  onVer,
   onEditar,
   onAlternar,
 }) {
@@ -84,7 +83,7 @@ function ProductosTabla({
             <thead>
               <tr>
                 <th scope="col">SKU</th>
-                <th scope="col">Producto</th>
+                <th scope="col" className="admin__col-producto">Producto</th>
                 <th scope="col">Categoría</th>
                 <th scope="col" className="admin__col-precio">
                   Precio
@@ -105,7 +104,7 @@ function ProductosTabla({
                 return (
                   <tr key={producto.id}>
                     <td className="admin__sku">{producto.sku}</td>
-                    <td>
+                    <td className="admin__col-producto">
                       <div className="admin__producto">
                         <span className="admin__producto-nombre">{producto.nombre}</span>
                       </div>
@@ -127,18 +126,6 @@ function ProductosTabla({
                     </td>
                     <td className="admin__col-acciones">
                       <div className="admin__acciones-fila">
-                        <button
-                          type="button"
-                          className="admin__accion"
-                          onClick={(evento) => {
-                            evento.stopPropagation()
-                            onVer(producto)
-                          }}
-                          aria-label={`Ver ${producto.nombre}`}
-                          title="Ver"
-                        >
-                          <IconVer width="17" height="17" />
-                        </button>
                         <button
                           type="button"
                           className="admin__accion"

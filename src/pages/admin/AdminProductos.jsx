@@ -78,7 +78,7 @@ function AdminProductos() {
         ...cambios,
         id: cambios.sku.toLowerCase(),
         stock: 0,
-        imagen: null,
+        imagen: cambios.imagen,
       }
       crearProducto(nuevo)
       setSeleccionId(nuevo.id)
@@ -94,7 +94,7 @@ function AdminProductos() {
   }
 
   function cancelar() {
-    if (modo === 'ver' || modo === 'nuevo') {
+    if (modo === 'nuevo') {
       setPanelAbierto(false)
       return
     }
@@ -130,7 +130,6 @@ function AdminProductos() {
           hayFiltros={hayFiltros}
           onFiltros={cambiarFiltros}
           onPagina={setPagina}
-          onVer={(producto) => abrir(producto, 'ver')}
           onEditar={(producto) => abrir(producto, 'editar')}
           onAlternar={(producto) => alternarEstadoProducto(producto.id)}
         />

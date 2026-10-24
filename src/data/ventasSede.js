@@ -13,7 +13,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 2 },
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
@@ -29,7 +28,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 1 },
@@ -46,7 +44,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 2 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 1 },
@@ -62,7 +59,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 1 },
@@ -79,7 +75,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
@@ -96,7 +91,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
@@ -113,7 +107,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 2 },
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
@@ -129,7 +122,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 1 },
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 2 },
@@ -146,7 +138,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno tarde',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
@@ -163,7 +154,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno tarde',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 3 },
@@ -179,7 +169,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno tarde',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 2 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 1 },
@@ -195,7 +184,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno tarde',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 1 },
@@ -211,7 +199,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 2 },
@@ -227,7 +214,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 2 },
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
@@ -243,7 +229,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 1 },
@@ -260,7 +245,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 4 },
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
@@ -276,7 +260,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 1 },
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 1 },
@@ -293,7 +276,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
@@ -310,7 +292,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
@@ -327,7 +308,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
     ],
@@ -342,7 +322,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 2 },
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 2 },
@@ -358,7 +337,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
     ],
@@ -373,7 +351,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 1 },
@@ -390,7 +367,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
     ],
@@ -405,7 +381,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
@@ -422,7 +397,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 3 },
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
@@ -438,7 +412,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
@@ -454,7 +427,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
     ],
@@ -469,7 +441,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
@@ -485,7 +456,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 3 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
@@ -502,7 +472,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
@@ -518,7 +487,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 1 },
@@ -535,7 +503,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
@@ -552,7 +519,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 2 },
@@ -568,7 +534,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 3 },
     ],
@@ -583,7 +548,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 2 },
@@ -599,7 +563,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
@@ -615,7 +578,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 2 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
@@ -632,7 +594,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 1 },
@@ -649,7 +610,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 1 },
@@ -665,7 +625,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 1 },
@@ -681,7 +640,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 1 },
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 2 },
@@ -697,7 +655,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
@@ -713,7 +670,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p25', nombre: 'Capuchino', precio: 30, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 3 },
@@ -730,7 +686,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno mañana',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 2 },
@@ -746,7 +701,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno mañana',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
       { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 2 },
@@ -763,7 +717,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno apertura',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p23', nombre: 'Muffin de arándanos', precio: 42, cantidad: 2 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
@@ -779,7 +732,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno apertura',
     metodo: 'tarjeta',
-    estado: 'Confirmada',
     items: [
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 1 },
@@ -795,7 +747,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 1',
     turno: 'Turno apertura',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p24', nombre: 'Tarta de fresa', precio: 68, cantidad: 1 },
       { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 2 },
@@ -812,7 +763,6 @@ export const VENTAS_SEDE = [
     caja: 'Caja 2',
     turno: 'Turno apertura',
     metodo: 'efectivo',
-    estado: 'Confirmada',
     items: [
       { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 1 },
     ],
@@ -820,27 +770,7 @@ export const VENTAS_SEDE = [
   },
 ]
 
-export const VENTA_PENDIENTE = {
-  id: 'vs248',
-  dia: 0,
-  folio: 'DS-0248',
-  hora: '10:41',
-  cajero: 'Ana López',
-  caja: 'Caja 1',
-  turno: 'Turno mañana',
-  metodo: 'efectivo',
-  estado: 'Pendiente',
-  items: [
-    { id: 'p3', nombre: 'Croissant de mantequilla', precio: 38, cantidad: 1 },
-    { id: 'p7', nombre: 'Pastel de chocolate', precio: 62, cantidad: 2 },
-    { id: 'p13', nombre: 'Roles de canela', precio: 24, cantidad: 1 },
-  ],
-  importe: 186,
-}
-
-// Historial completo de la sede: la venta pendiente va primero por ser la más
-// reciente, aunque todavía no cuente para los ingresos del día.
-export const HISTORIAL_SEDE = [VENTA_PENDIENTE, ...VENTAS_SEDE]
+export const HISTORIAL_SEDE = VENTAS_SEDE
 
 // Cajeros que rotan por las cajas de la sede.
 export const CAJEROS_SEDE = ['Ana López', 'Renzo Soto', 'Camila Ríos', 'Diego Martín']

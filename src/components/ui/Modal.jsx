@@ -11,7 +11,6 @@ function Modal({
   icono,
   tono = 'neutro',
   ancho = false,
-  lateral = false,
   acciones,
   accionesEnFila = false,
   children,
@@ -41,10 +40,9 @@ function Modal({
 
   const clases = ['ui__modal-panel']
   if (ancho) clases.push('ui__modal-panel--ancho')
-  if (lateral) clases.push('ui__modal-panel--lateral')
 
   return (
-    <div className={`ui__modal${lateral ? ' ui__modal--lateral' : ''}`} onClick={onCerrar}>
+    <div className="ui__modal" onClick={onCerrar}>
       <div
         ref={panelRef}
         className={clases.join(' ')}

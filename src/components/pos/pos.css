@@ -17,12 +17,16 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  width: 258px;
-  min-width: 258px;
+  width: 280px;
+  min-width: 280px;
   height: 100svh;
   padding: 22px 18px;
   background: var(--white);
   border-right: 1px solid var(--line);
+}
+
+.pos__sidebar a {
+  width: 280px;
 }
 
 .pos__marca {
@@ -206,6 +210,25 @@
   font-size: 12px;
   line-height: 1.4;
   color: var(--ink-soft);
+}
+
+.pos__ayuda-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--terracotta);
+  text-decoration: none;
+}
+
+.pos__ayuda-enlace:hover {
+  color: var(--terracotta-dark);
+  text-decoration: underline;
 }
 
 .pos__perfil {
@@ -714,8 +737,7 @@
 }
 
 .pos__total-linea--grande {
-  padding-top: 10px;
-  border-top: 1px solid var(--line);
+  padding-top: 0;
 }
 
 .pos__total-linea--grande > span:first-child {

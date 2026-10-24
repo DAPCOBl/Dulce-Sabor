@@ -1,32 +1,24 @@
+import { getUsuarios } from './usuarios'
+
 const SESSION_KEY = 'dulcesabor:session'
 
 // Credenciales de demostración (solo frontend).
 // Reemplazar por un login real contra el backend antes de producción.
-const USERS = [
-  {
-    email: 'cristian@dulcesabor.com',
-    password: 'admin',
-    nombre: 'María García',
-    rol: 'administrador',
-  },
-  {
-    email: 'renzo@dulcesabor.com',
-    password: 'cajero',
-    nombre: 'Renzo',
-    rol: 'cajero',
-  },
-]
+// Las cuentas se gestionan desde el módulo de Usuarios (services/usuarios.js).
 
 export function login(email, password) {
-  const user = USERS.find(
-    (candidate) => candidate.email === email.trim().toLowerCase() && candidate.password === password,
+  const user = getUsuarios().find(
+    (candidate) =>
+      candidate.email === email.trim().toLowerCase() &&
+      candidate.password === password &&
+      candidate.estado === 'Activo',
   )
 
   if (!user) {
     return { ok: false, error: 'Correo o contraseña incorrectos.' }
   }
 
-  const session = { user: { nombre: user.nombre, email: user.email, rol: user.rol } }
+  const session = { user: { id: user.id, nombre: user.nombre, email: user.email, rol: user.rol } }
   localStorage.setItem(SESSION_KEY, JSON.stringify(session))
   return { ok: true, session }
 }
@@ -50,3 +42,4 @@ export function logout() {
 export function isAdministrador(session) {
   return session?.user?.rol === 'administrador'
 }
+

@@ -84,10 +84,6 @@ export function IconEyeOff(props) {
   return <IconoBase nombre="eye-slash" {...props} />
 }
 
-export function IconCalendar(props) {
-  return <IconoBase nombre="calendar-days" {...props} />
-}
-
 export function IconUser(props) {
   return <IconoBase nombre="user" {...props} />
 }
@@ -102,10 +98,6 @@ export function IconLock(props) {
 
 export function IconInfo(props) {
   return <IconoBase nombre="circle-info" {...props} />
-}
-
-export function IconBell(props) {
-  return <IconoBase nombre="bell" {...props} />
 }
 
 export function IconExport(props) {
@@ -140,10 +132,6 @@ export function IconTendenciaUp(props) {
   return <IconoBase nombre="arrow-trend-up" {...props} />
 }
 
-export function IconTendenciaDown(props) {
-  return <IconoBase nombre="arrow-trend-down" {...props} />
-}
-
 /* ---------- Ventas y punto de venta ---------- */
 
 export function IconPos(props) {
@@ -154,20 +142,12 @@ export function IconSales(props) {
   return <IconoBase nombre="receipt" {...props} />
 }
 
-export function IconVentas(props) {
-  return <IconoBase nombre="receipt" {...props} />
-}
-
 export function IconCash(props) {
   return <IconoBase nombre="money-bill-1-wave" {...props} />
 }
 
 export function IconCard(props) {
   return <IconoBase nombre="credit-card" {...props} />
-}
-
-export function IconTicket(props) {
-  return <IconoBase nombre="ticket" {...props} />
 }
 
 export function IconEmptyCart(props) {
@@ -196,10 +176,6 @@ export function IconInventario(props) {
   return <IconoBase nombre="truck-ramp-box" {...props} />
 }
 
-export function IconAlertaStock(props) {
-  return <IconoBase nombre="triangle-exclamation" {...props} />
-}
-
 /* ---------- Secciones del panel de administración ---------- */
 
 export function IconResumen(props) {
@@ -210,14 +186,6 @@ export function IconReportes(props) {
   return <IconoBase nombre="chart-simple" {...props} />
 }
 
-export function IconSedes(props) {
-  return <IconoBase nombre="shop" {...props} />
-}
-
 export function IconUsuarios(props) {
   return <IconoBase nombre="users" {...props} />
-}
-
-export function IconVer(props) {
-  return <IconoBase nombre="eye" {...props} />
 }

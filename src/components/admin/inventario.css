@@ -10,7 +10,7 @@
 
 .admin__inventario-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 372px;
+  grid-template-columns: 1fr;
   gap: 18px;
   align-items: stretch;
 }
@@ -53,10 +53,6 @@
   transition: color 0.2s;
 }
 
-.admin__producto-nombre:hover {
-  color: var(--terracotta);
-}
-
 .admin__producto-sku {
   font-size: 11.5px;
   font-weight: 600;
@@ -93,6 +89,13 @@
 .admin__badge--disponible {
   background: color-mix(in srgb, var(--success-text) 12%, transparent);
   color: var(--success-text);
+}
+
+.admin__badge--disponible,
+.admin__badge--bajo {
+  min-width: 120px;
+  display: inline-block;
+  text-align: center;
 }
 
 /* ---------- Paginación ---------- */
@@ -319,15 +322,23 @@
 
 /* ---------- Movimientos recientes ---------- */
 
+.ui__tabla--movimientos th,
+.ui__tabla--movimientos td {
+  text-align: left;
+}
+
 .admin__mov-tipo {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 7px;
   padding: 5px 11px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
+  min-width: 90px;
 }
 
 .admin__mov-tipo--entrada {
@@ -377,11 +388,16 @@
   color: var(--ink-soft);
 }
 
+.ui__tabla--movimientos .admin__col-tipo {
+  text-align: center;
+}
+
 .admin__mov-responsable {
   font-size: 14px;
   font-weight: 600;
   color: var(--ink);
   white-space: nowrap;
+  text-align: left;
 }
 
 .admin__pie-notas {
@@ -402,24 +418,6 @@
 
 .admin__pie-notas i {
   color: var(--terracotta);
-}
-
-.admin__prototipo {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 18px 22px;
-  border: 1px dashed var(--line);
-  border-radius: 16px;
-  font-size: 12.5px;
-  color: var(--ink-soft);
-}
-
-.admin__prototipo strong {
-  color: var(--ink);
-  font-weight: 600;
 }
 
 /* ---------- Responsive ---------- */

@@ -53,11 +53,15 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--terracotta);
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .ui__enlace:hover {
@@ -146,6 +150,10 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
+}
+
+.ui__kpis--dos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .ui__kpis--tres {
@@ -461,7 +469,7 @@
   display: flex;
   align-items: center;
   flex: 1;
-  min-width: 220px;
+  min-width: 320px;
   color: var(--ink-soft);
 }
 
@@ -785,21 +793,6 @@
   width: min(560px, 100%);
 }
 
-/* Modal lateral: la ficha de producto entra desde la derecha. */
-
-.ui__modal--lateral {
-  place-items: stretch end;
-  padding: 0;
-}
-
-.ui__modal-panel--lateral {
-  width: min(560px, 100%);
-  height: 100svh;
-  max-height: 100svh;
-  border-radius: 20px 0 0 20px;
-  animation: ui__modal-desliza 0.24s cubic-bezier(0.2, 0.8, 0.3, 1);
-}
-
 .ui__modal-panel:focus {
   outline: none;
 }
@@ -998,13 +991,6 @@
   from {
     opacity: 0;
     transform: translateY(14px) scale(0.97);
-  }
-}
-
-@keyframes ui__modal-desliza {
-  from {
-    transform: translateX(40px);
-    opacity: 0;
   }
 }
 
@@ -1215,6 +1201,7 @@
 
 @media (max-width: 1080px) {
   .ui__kpis,
+  .ui__kpis--dos,
   .ui__kpis--tres {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1222,6 +1209,7 @@
 
 @media (max-width: 860px) {
   .ui__kpis,
+  .ui__kpis--dos,
   .ui__kpis--tres {
     grid-template-columns: minmax(0, 1fr);
   }

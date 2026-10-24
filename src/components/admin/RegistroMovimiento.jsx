@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Modal from '../ui/Modal'
 import { IconArrow, IconInfo, IconSuccess } from '../ui/icons'
 import { MOTIVOS_AJUSTE, MOTIVOS_ENTRADA, RESPONSABLES_INVENTARIO } from '../../data/inventario'
 
@@ -10,8 +11,8 @@ function RegistroMovimiento({
   productoId,
   productoPorDefecto,
   onProductoChange,
-  activarForm,
   onRegistrar,
+  onCerrar,
 }) {
   const [tipo, setTipo] = useState('entrada')
   const [cantidad, setCantidad] = useState(CANTIDAD_INICIAL)
@@ -22,8 +23,8 @@ function RegistroMovimiento({
   const campoProductoRef = useRef(null)
 
   useEffect(() => {
-    if (activarForm > 0) campoProductoRef.current?.focus()
-  }, [activarForm])
+    campoProductoRef.current?.focus()
+  }, [])
 
   const producto = productos.find((item) => item.id === productoId) ?? productos[0]
   const stockActual = producto?.stock ?? 0
@@ -64,23 +65,22 @@ function RegistroMovimiento({
     setCantidad(CANTIDAD_INICIAL)
     setMotivo(tipo === 'entrada' ? MOTIVOS_ENTRADA[0] : MOTIVOS_AJUSTE[0])
     setExito(null)
+    onCerrar?.()
   }
 
   return (
-    <section className="admin__tarjeta admin__registro">
-      <header className="admin__tarjeta-header">
-        <div>
-          <h2 className="admin__tarjeta-titulo">
-            {tipo === 'entrada' ? 'Registrar entrada' : 'Registrar ajuste'}
-          </h2>
-          <p className="admin__tarjeta-sub">
-            {tipo === 'entrada'
-              ? 'Suma existencias de producción o proveedor'
-              : 'Corrige el stock con el conteo físico'}
-          </p>
-        </div>
+    <Modal
+      onCerrar={onCerrar}
+      titulo={tipo === 'entrada' ? 'Registrar entrada' : 'Registrar ajuste'}
+      subtitulo={
+        tipo === 'entrada'
+          ? 'Suma existencias de producción o proveedor'
+          : 'Corrige el stock con el conteo físico'
+      }
+    >
+      <div className="admin__modal-borrador">
         <span className="admin__borrador">Borrador</span>
-      </header>
+      </div>
 
       <div className="admin__tabs" role="tablist" aria-label="Tipo de movimiento">
         <button
@@ -214,7 +214,7 @@ function RegistroMovimiento({
           </button>
         </div>
       </form>
-    </section>
+    </Modal>
   )
 }
 

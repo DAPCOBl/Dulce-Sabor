@@ -1,10 +1,12 @@
 /* ================= ADMIN · Módulo de productos ================= */
 
-.admin__principal:has(.admin__productos) {
+.admin__principal:has(.admin__productos),
+.admin__principal:has(.admin__usuarios) {
   max-width: 1680px;
 }
 
-.admin__productos {
+.admin__productos,
+.admin__usuarios {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -46,6 +48,33 @@
   background: var(--line);
 }
 
+/* ---------- Ajuste KPIs página Usuarios ---------- */
+.admin__usuarios .ui__kpi {
+  padding: 16px 18px;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+.admin__usuarios .ui__kpi-top {
+  justify-content: center;
+  gap: 8px;
+  min-height: 0;
+}
+
+.admin__usuarios .ui__kpi-etiqueta {
+  text-align: center;
+}
+
+.admin__usuarios .ui__kpi-etiqueta:empty {
+  display: none;
+}
+
+.admin__usuarios .ui__kpi-valor {
+  justify-content: center;
+  font-size: 28px;
+}
+
 /* ---------- Estructura tabla + panel ---------- */
 
 .admin__productos-cuerpo {
@@ -85,6 +114,7 @@
 .ui__tabla--productos thead th,
 .ui__tabla--productos tbody td {
   padding: 12px 13px;
+  text-align: left;
 }
 
 .ui__tabla--productos tbody tr:hover {
@@ -99,18 +129,25 @@
   white-space: nowrap;
 }
 
-.admin__producto {
+.admin__catalogo .admin__producto {
   display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
   min-width: 140px;
+  width: 100%;
 }
 
 .admin__producto-nombre {
+  padding: 0;
+  border: none;
+  background: transparent;
   font-size: 14.5px;
   font-weight: 600;
   color: var(--ink);
   line-height: 1.25;
+  text-align: left !important;
   overflow-wrap: break-word;
 }
 
@@ -130,6 +167,10 @@
   white-space: nowrap;
 }
 
+.admin__col-producto {
+  text-align: left !important;
+}
+
 .admin__col-precio {
   text-align: right;
   white-space: nowrap;
@@ -145,6 +186,21 @@
 .admin__estado.admin__estado--inactivo {
   background: color-mix(in srgb, var(--danger) 12%, transparent);
   color: var(--danger);
+}
+
+.admin__estado {
+  min-width: 110px;
+  justify-content: center;
+}
+
+.admin__pago {
+  min-width: 110px;
+  justify-content: center;
+}
+
+.admin__pago--tarjeta {
+  min-width: 110px;
+  justify-content: center;
 }
 
 .admin__col-acciones {
@@ -202,7 +258,7 @@
   flex-direction: column;
   gap: 14px;
   min-height: 0;
-  padding: 18px 20px;
+  padding: 20px 0;
   overflow-y: auto;
 }
 
@@ -377,3 +433,77 @@
     align-self: flex-start;
   }
 }
+/* ---------- Carga de imagen ---------- */
+.admin__imagen-carga {
+  position: relative;
+}
+
+.admin__imagen-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.admin__imagen-etiqueta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 18px;
+  border: 1.5px dashed var(--line);
+  border-radius: 14px;
+  background: var(--white);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+}
+
+.admin__imagen-etiqueta:hover {
+  border-color: var(--terracotta);
+  background: color-mix(in srgb, var(--terracotta) 6%, var(--white));
+}
+
+.admin__imagen-carga--error .admin__imagen-etiqueta {
+  border-color: var(--danger);
+}
+
+.admin__imagen-carga--deshabilitada .admin__imagen-etiqueta {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.admin__imagen-preview {
+  width: 132px;
+  height: 132px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(20, 12, 8, 0.1);
+}
+
+.admin__imagen-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--cream-soft);
+  color: var(--ink-soft);
+}
+
+.admin__imagen-texto {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.admin__imagen-ayuda {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+

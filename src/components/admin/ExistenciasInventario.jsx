@@ -82,7 +82,9 @@ function ExistenciasInventario({
         <table className="ui__tabla">
           <thead>
             <tr>
-              <th>Producto / SKU</th>
+              <th>Producto</th>
+              <th>SKU</th>
+              <th>Categoría</th>
               <th>Stock actual</th>
               <th>Mínimo</th>
               <th>Estado</th>
@@ -92,18 +94,17 @@ function ExistenciasInventario({
             {productos.map((producto) => (
               <tr key={producto.id}>
                 <td>
-                  <div className="admin__producto">
-                    <button
-                      type="button"
-                      className="admin__producto-nombre"
-                      onClick={() => onElegir(producto)}
-                      title={`Registrar movimiento de ${producto.nombre}`}
-                    >
-                      {producto.nombre}
-                    </button>
-                    <span className="admin__producto-sku">{producto.sku}</span>
-                  </div>
+                  <button
+                    type="button"
+                    className="admin__producto-nombre"
+                    onClick={() => onElegir(producto)}
+                    title={`Registrar movimiento de ${producto.nombre}`}
+                  >
+                    {producto.nombre}
+                  </button>
                 </td>
+                <td className="admin__sku">{producto.sku}</td>
+                <td className="admin__celda-suave">{producto.categoria}</td>
                 <td>
                   <span className="admin__stock">{producto.stock}</span>
                 </td>
@@ -120,7 +121,7 @@ function ExistenciasInventario({
 
             {productos.length === 0 && (
               <tr>
-                <td colSpan={4} className="admin__celda-vacia">
+                <td colSpan={6} className="admin__celda-vacia">
                   Ningún producto coincide con los filtros aplicados.
                 </td>
               </tr>

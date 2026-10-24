@@ -23,7 +23,6 @@ function UltimasVentas({ ventas, onVerVentas }) {
               <th>Venta</th>
               <th>Hora</th>
               <th>Pago</th>
-              <th>Estado</th>
               <th className="admin__col-total">Total COP</th>
               <th>Cajero</th>
             </tr>
@@ -40,12 +39,6 @@ function UltimasVentas({ ventas, onVerVentas }) {
                     <span className={`admin__pago admin__pago--${venta.metodo}`}>
                       <IconoMetodo width="14" height="14" />
                       {metodo.etiqueta}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="admin__estado">
-                      <span className="admin__estado-punto" />
-                      {venta.estado}
                     </span>
                   </td>
                   <td className="admin__col-total admin__total">{moneda(venta.importe)}</td>

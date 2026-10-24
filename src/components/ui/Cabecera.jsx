@@ -3,7 +3,7 @@ import './ui.css'
 
 // Cabecera unificada: miga de pan, título, bajada y acciones a la derecha.
 function Cabecera({ titulo, subtitulo, acciones, miga, sede = 'Sede principal' }) {
-  const rutaMiga = miga && miga !== titulo ? miga : undefined
+  const rutaMiga = miga
 
   return (
     <header className="ui__cabecera">

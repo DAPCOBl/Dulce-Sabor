@@ -15,7 +15,6 @@ const ESTADO_INICIAL = {
   ventas: VENTAS_TURNO.map((venta) => ({
     ...venta,
     cajero: CAJERO_SEMILLA,
-    estado: 'Confirmada',
   })),
   productos: PRODUCTOS.map(productoConPrecio),
   // Existencia y trazabilidad del módulo de inventario.
@@ -56,6 +55,9 @@ function fusionarProducto(canonico, guardado) {
   for (const campo of CAMPOS_EDITABLES) {
     if (guardado[campo] !== undefined) producto[campo] = guardado[campo]
   }
+  // La imagen es obligatoria: solo se respeta la guardada si existe, para no
+  // perder la imagen del catálogo por estados antiguos sin foto.
+  if (guardado.imagen) producto.imagen = guardado.imagen
   return producto
 }
 
@@ -177,7 +179,7 @@ export function registrarVenta(venta, cajero) {
   const items = venta.items ?? []
 
   actualizar({
-    ventas: [{ ...venta, cajero, estado: 'Confirmada' }, ...estado.ventas],
+    ventas: [{ ...venta, cajero }, ...estado.ventas],
     productos: estado.productos.map((producto) => {
       const item = items.find((registro) => registro.id === producto.id)
       if (!item) return producto

@@ -29,8 +29,8 @@ src/
 
 | Rol             | Correo                  | Contraseña  |
 | --------------- | ----------------------- | ----------- |
-| Administrador   | ana@dulcesabor.ejemplo  | admin1234   |
-| Cajero          | carlos@dulcesabor.ejemplo | caja1234  |
+| Administrador   | cristian@dulcesabor.com | admin       |
+| Cajero          | renzo@dulcesabor.com    | cajero      |
 
 Definidos en `src/services/auth.js` (mock, sin backend). El rol decide qué pantalla se muestra tras el login.
 

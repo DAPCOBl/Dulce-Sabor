@@ -31,8 +31,6 @@ function Paginacion({ pagina, paginas, onPagina, texto, extra }) {
       {texto && <p className="ui__paginacion-texto">{texto}</p>}
 
       <div className="ui__paginacion-derecha">
-        {extra}
-
         <div className="ui__paginacion-controles">
           <button
             type="button"
@@ -72,6 +70,8 @@ function Paginacion({ pagina, paginas, onPagina, texto, extra }) {
             <IconChevronDer width="16" height="16" />
           </button>
         </div>
+
+        {extra}
       </div>
     </div>
   )

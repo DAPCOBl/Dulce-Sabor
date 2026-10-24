@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ExistenciasInventario from './ExistenciasInventario'
 import InventarioKpis from './InventarioKpis'
 import MovimientosRecientes from './MovimientosRecientes'
@@ -16,9 +16,8 @@ function InventarioPanel({ session }) {
   const [filtros, setFiltros] = useState({ busqueda: '', categoria: 'todas', estado: 'todos' })
   const [pagina, setPagina] = useState(1)
   const [productoInicial, setProductoInicial] = useState(PRODUCTO_INICIAL)
-  const [activarForm, setActivarForm] = useState(0)
-
-  const registroRef = useRef(null)
+  const [modalAbierto, setModalAbierto] = useState(false)
+  const [claveRegistro, setClaveRegistro] = useState(0)
 
   const productos = useMemo(
     () => inventario.map((producto) => ({ ...producto, estado: estadoDeInventario(producto) })),
@@ -53,13 +52,18 @@ function InventarioPanel({ session }) {
 
   function elegirProducto(producto) {
     setProductoInicial(producto.id)
-    setActivarForm((contador) => contador + 1)
-    registroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    setModalAbierto(true)
+    setClaveRegistro((contador) => contador + 1)
   }
 
   function activarRegistro() {
-    setActivarForm((contador) => contador + 1)
-    registroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    setModalAbierto(true)
+    setClaveRegistro((contador) => contador + 1)
+  }
+
+  function cerrarModal() {
+    setModalAbierto(false)
+    setProductoInicial(PRODUCTO_INICIAL)
   }
 
   function guardarMovimiento(datos) {
@@ -99,27 +103,22 @@ function InventarioPanel({ session }) {
           onElegir={elegirProducto}
         />
 
-        <div ref={registroRef}>
-          <RegistroMovimiento
-            productos={productos}
-            session={session}
-            productoId={productoInicial}
-            productoPorDefecto={PRODUCTO_INICIAL}
-            onProductoChange={setProductoInicial}
-            activarForm={activarForm}
-            onRegistrar={guardarMovimiento}
-          />
-        </div>
       </div>
 
-      <MovimientosRecientes movimientos={movimientos} />
+      {modalAbierto && (
+        <RegistroMovimiento
+          key={claveRegistro}
+          productos={productos}
+          session={session}
+          productoId={productoInicial}
+          productoPorDefecto={PRODUCTO_INICIAL}
+          onProductoChange={setProductoInicial}
+          onRegistrar={guardarMovimiento}
+          onCerrar={cerrarModal}
+        />
+      )}
 
-      <footer className="admin__prototipo">
-        <p>
-          <strong>Prototipo visual · Dulce Sabor</strong> · Módulo de inventario
-        </p>
-        <p>Las existencias se sincronizan con el punto de venta de la sede principal.</p>
-      </footer>
+      <MovimientosRecientes movimientos={movimientos} />
     </div>
   )
 }

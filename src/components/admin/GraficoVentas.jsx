@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { moneda } from '../ui/format'
 
 function milesCorto(valor) {
@@ -5,10 +6,18 @@ function milesCorto(valor) {
   return `${Number.isInteger(miles) ? miles : miles.toFixed(1)} mil`
 }
 
-function GraficoVentas({ serie, total }) {
+function GraficoVentas({ serie, total, rango = 'Rango seleccionado' }) {
+  const denso = serie.length > 14
   const maximo = Math.max(...serie.map((punto) => punto.valor), 1)
   const escala = Math.max(Math.ceil(maximo / 1000) * 1000, 1000)
   const resumen = serie.map((punto) => `${punto.etiqueta}: ${moneda(punto.valor)}`).join(', ')
+  const contenedorRef = useRef(null)
+
+  useEffect(() => {
+    const contenedor = contenedorRef.current
+    if (!contenedor || !denso) return
+    contenedor.scrollLeft = contenedor.scrollWidth
+  }, [denso, serie])
 
   return (
     <section className="admin__tarjeta admin__grafico">
@@ -18,33 +27,48 @@ function GraficoVentas({ serie, total }) {
           <p className="admin__tarjeta-sub">Ingresos diarios · COP</p>
         </div>
 
-        <span className="admin__grafico-rango">Últimos 7 días</span>
+        <span className="admin__grafico-rango">{rango}</span>
       </header>
 
       <div className="admin__grafico-cuerpo">
         <div className="admin__grafico-eje" aria-hidden="true">
           <span>{milesCorto(escala)}</span>
           <span>{milesCorto(escala / 2)}</span>
-          <span />
+          <span>0</span>
         </div>
 
         <div
-          className="admin__grafico-barras"
+          ref={contenedorRef}
+          className={`admin__grafico-barras${denso ? " admin__grafico-barras--denso" : ""}`}
           role="img"
-          aria-label={`Ingresos de los últimos 7 días. ${resumen}`}
+          aria-label={`Ingresos del rango ${rango}. ${resumen}`}
         >
           {serie.map((punto, indice) => {
             const esActual = indice === serie.length - 1
-            const alto = Math.max(Math.round((punto.valor / escala) * 100), 4)
+            const alto = punto.valor > 0
+              ? Math.max(Math.round((punto.valor / escala) * 100), 6)
+              : 2
             return (
               <div
                 key={punto.etiqueta}
                 className={`admin__barra${esActual ? ' admin__barra--actual' : ''}`}
+                title={`${punto.etiqueta}: ${moneda(punto.valor)} COP`}
               >
-                <span className="admin__barra-valor">{esActual ? moneda(punto.valor) : ''}</span>
                 <div className="admin__barra-pista">
-                  <div className="admin__barra-fill" style={{ height: `${alto}%` }} />
+                  <div
+                    className="admin__barra-fill"
+                    style={{ height: `${alto}%` }}
+                  />
+                  <span
+                    className="admin__barra-tooltip"
+                    role="tooltip"
+                    style={{ bottom: '76%' }}
+                  >
+                    {moneda(punto.valor)}
+                    <em>COP</em>
+                  </span>
                 </div>
+
                 <span className="admin__barra-etiqueta">{punto.etiqueta}</span>
               </div>
             )
@@ -53,7 +77,7 @@ function GraficoVentas({ serie, total }) {
       </div>
 
       <footer className="admin__grafico-pie">
-        <span>Total de los últimos 7 días</span>
+        <span>Total del rango</span>
         <strong>
           {moneda(total)}
           <em>COP</em>

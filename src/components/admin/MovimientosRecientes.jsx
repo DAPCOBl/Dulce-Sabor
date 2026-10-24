@@ -16,11 +16,11 @@ function MovimientosRecientes({ movimientos }) {
       </header>
 
       <div className="ui__tabla-wrap">
-        <table className="ui__tabla">
+        <table className="ui__tabla ui__tabla--movimientos">
           <thead>
             <tr>
               <th>Hora / Referencia</th>
-              <th>Tipo</th>
+              <th className="admin__col-tipo">Tipo</th>
               <th>Producto</th>
               <th>Cambio</th>
               <th>Saldo</th>
@@ -34,7 +34,7 @@ function MovimientosRecientes({ movimientos }) {
                   <p className="admin__folio">{movimiento.hora}</p>
                   <p className="admin__referencia">{movimiento.referencia}</p>
                 </td>
-                <td>
+                <td className="admin__col-tipo">
                   <span
                     className={`admin__mov-tipo admin__mov-tipo--${TIPOS_MOVIMIENTO[movimiento.tipo]?.clase ?? 'entrada'}`}
                   >
@@ -73,11 +73,7 @@ function MovimientosRecientes({ movimientos }) {
       <footer className="admin__pie-notas">
         <p>
           <IconInfo width="15" height="15" />
-          Los movimientos no se editan: para corregir un registro se genera un ajuste con su motivo.
-        </p>
-        <p>
-          <IconInfo width="15" height="15" />
-          Cada ajuste queda firmado por el responsable y no se puede eliminar.
+          Los movimientos no se editan: para corregir un registro comunicarse con el administrador.
         </p>
       </footer>
     </section>

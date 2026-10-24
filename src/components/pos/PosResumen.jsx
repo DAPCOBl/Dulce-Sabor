@@ -79,7 +79,7 @@ function PosResumen({
           <div className="pos__total-linea pos__total-linea--grande">
             <span>Total a cobrar</span>
             <span className="pos__total-valor">
-              <em>COP</em> {moneda(total)}
+              {moneda(total)} <em>COP</em>
             </span>
           </div>
         </div>
