@@ -2,12 +2,12 @@ import { formatHora } from '../components/ui/format'
 import { PRODUCTOS_POR_ID } from './menu'
 import { totalDe } from './precios'
 
-export const TURNO = {
+export const DATOS_SEDE = {
   sucursal: 'Sede principal',
   moneda: 'COP',
 }
 
-// Semilla del turno: cada venta referencia productos reales del menú
+// Semilla de ventas del día: cada venta referencia productos reales del menú
 // (id + cantidad). Los importes se calculan con los precios actuales.
 const SEMILLA_VENTAS = [
   {
@@ -66,12 +66,7 @@ function itemsDeProductos(items) {
   })
 }
 
-// El importe de la venta es la simple suma de los productos vendidos.
-function calcularImporte(items) {
-  return totalDe(items)
-}
-
-export const VENTAS_TURNO = SEMILLA_VENTAS.map((venta) => {
+export const VENTAS_INICIALES = SEMILLA_VENTAS.map((venta) => {
   const items = itemsDeProductos(venta.items)
   return {
     id: venta.id,
@@ -79,7 +74,7 @@ export const VENTAS_TURNO = SEMILLA_VENTAS.map((venta) => {
     hora: venta.hora,
     metodo: venta.metodo,
     items,
-    importe: calcularImporte(items),
+    importe: totalDe(items),
   }
 })
 
@@ -103,6 +98,6 @@ export function crearVenta(ventas, carrito, metodo) {
     hora: formatHora(new Date()),
     metodo,
     items,
-    importe: calcularImporte(items),
+    importe: totalDe(items),
   }
 }

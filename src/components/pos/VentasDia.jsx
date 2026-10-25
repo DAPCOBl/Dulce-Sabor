@@ -6,10 +6,10 @@ import Vacio from '../ui/Vacio'
 import { IconCash, IconCard, IconEye, IconPlus, IconSales, IconSuccess } from '../ui/icons'
 import { moneda, pluralVentas } from '../ui/format'
 import { metodoDePago } from '../ui/metodos'
-import { TURNO } from '../../data/ventas'
+import { DATOS_SEDE } from '../../data/ventas'
 import './ventas.css'
 
-function VentasTurno({ ventas, onNuevaVenta, onVer }) {
+function VentasDia({ ventas, onNuevaVenta, onVer }) {
   const [busqueda, setBusqueda] = useState('')
   const [metodo, setMetodo] = useState('todos')
 
@@ -52,9 +52,9 @@ function VentasTurno({ ventas, onNuevaVenta, onVer }) {
   return (
     <section className="ventas">
       <Cabecera
-        miga="Ventas del turno"
-        titulo="Ventas del turno"
-        subtitulo="Consulta las ventas cobradas y sus comprobantes en tu turno actual."
+        miga="Ventas del día"
+        titulo="Ventas del día"
+        subtitulo="Consulta las ventas cobradas y sus comprobantes del día."
         acciones={
           <button type="button" className="ui__boton ui__boton--primario" onClick={onNuevaVenta}>
             <IconPlus width="17" height="17" />
@@ -66,9 +66,9 @@ function VentasTurno({ ventas, onNuevaVenta, onVer }) {
       <div className="ui__kpis">
         <Kpi
           destacado
-          etiqueta="Total del turno"
+          etiqueta="Total del día"
           valor={moneda(totales.total)}
-          unidad={TURNO.moneda}
+          unidad={DATOS_SEDE.moneda}
           nota={pluralVentas(conteos.todos)}
           icono={<IconSales width="17" height="17" />}
         />
@@ -87,14 +87,14 @@ function VentasTurno({ ventas, onNuevaVenta, onVer }) {
         <Kpi
           etiqueta="Efectivo"
           valor={moneda(totales.efectivo)}
-          unidad={TURNO.moneda}
+          unidad={DATOS_SEDE.moneda}
           nota={pluralVentas(conteos.efectivo)}
           icono={<IconCash width="17" height="17" />}
         />
         <Kpi
           etiqueta="Tarjeta"
           valor={moneda(totales.tarjeta)}
-          unidad={TURNO.moneda}
+          unidad={DATOS_SEDE.moneda}
           nota={pluralVentas(conteos.tarjeta)}
           icono={<IconCard width="17" height="17" />}
         />
@@ -181,12 +181,12 @@ function VentasTurno({ ventas, onNuevaVenta, onVer }) {
 
         <footer className="ventas__pie">
           <span>
-            Mostrando {filtradas.length} de {ventas.length} ventas de tu turno
+            Mostrando {filtradas.length} de {ventas.length} ventas del día
           </span>
           <span className="ventas__total">
-            Total del turno
+            Total del día
             <strong>
-              {moneda(totalFiltrado)} {TURNO.moneda}
+              {moneda(totalFiltrado)} {DATOS_SEDE.moneda}
             </strong>
           </span>
         </footer>
@@ -195,4 +195,4 @@ function VentasTurno({ ventas, onNuevaVenta, onVer }) {
   )
 }
 
-export default VentasTurno
+export default VentasDia

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { UNIDAD_POR_CATEGORIA } from '../../data/unidades'
 import { generarSku } from '../../services/estado'
 import Modal from '../ui/Modal'
 import { IconInfo } from '../ui/icons'
@@ -16,7 +15,6 @@ function valoresIniciales(producto) {
       nombre: '',
       sku: generarSku('Pan dulce'),
       categoria: 'Pan dulce',
-      unidad: 'pieza',
       precio: '',
       coste: '',
       stockMinimo: '',
@@ -43,7 +41,6 @@ function ProductoEditor({
   producto,
   modo,
   categorias,
-  unidades,
   estados,
   catalogo,
   onGuardar,
@@ -80,20 +77,11 @@ function ProductoEditor({
 
 
   function cambiarCategoria(categoria) {
-    setForm((actual) => {
-      // La unidad acompaña a la categoría, salvo que el usuario ya la haya
-      // elegido a mano.
-      const sugerida = UNIDAD_POR_CATEGORIA[categoria] ?? actual.unidad
-      const unidad = UNIDAD_POR_CATEGORIA[actual.categoria] === actual.unidad ? sugerida : actual.unidad
-
-      return {
-        ...actual,
-        categoria,
-        unidad,
-
-        sku: skuEditado ? actual.sku : generarSku(categoria),
-      }
-    })
+    setForm((actual) => ({
+      ...actual,
+      categoria,
+      sku: skuEditado ? actual.sku : generarSku(categoria),
+    }))
   }
 
   function validar() {
@@ -131,7 +119,6 @@ function ProductoEditor({
       nombre: form.nombre.trim(),
       sku: form.sku.trim().toUpperCase(),
       categoria: form.categoria,
-      unidad: form.unidad,
       precio: Number(form.precio),
       coste: Number(form.coste),
       stockMinimo: Number(form.stockMinimo),
@@ -161,7 +148,7 @@ function ProductoEditor({
     if (existencias <= 0) {
       aviso = `No hay existencias de ${producto.nombre}. Se generará una alerta en el inventario.`
     } else if (existencias <= minimo) {
-      aviso = `Quedan ${existencias} unidades y el stock mínimo es de ${minimo}. Repón antes del próximo turno.`
+      aviso = `Quedan ${existencias} unidades y el stock mínimo es de ${minimo}. Repón lo antes posible.`
     } else {
       aviso = `Hoy hay ${existencias} unidades en la sede principal. El stock mínimo es de ${minimo}, así que todavía hay margen.`
     }
@@ -237,7 +224,6 @@ function ProductoEditor({
           {errores.sku && <p className="admin__campo-error">{errores.sku}</p>}
         </div>
 
-        <div className="admin__campo-par">
           <div className="admin__campo">
             <label className="admin__campo-label" htmlFor="producto-categoria">
               Categoría
@@ -256,26 +242,6 @@ function ProductoEditor({
               ))}
             </select>
           </div>
-
-          <div className="admin__campo">
-            <label className="admin__campo-label" htmlFor="producto-unidad">
-              Unidad de venta
-            </label>
-            <select
-              id="producto-unidad"
-              className="admin__input admin__select-editor"
-              value={form.unidad}
-              onChange={(evento) => actualizar('unidad', evento.target.value)}
-              disabled={soloLectura}
-            >
-              {unidades.map((unidad) => (
-                <option key={unidad} value={unidad}>
-                  {unidad}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
          <div className="admin__campo">
            <label className="admin__campo-label" htmlFor="producto-imagen">
              Imagen (obligatoria)

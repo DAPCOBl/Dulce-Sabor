@@ -3,12 +3,11 @@ import PosSidebar from '../../components/pos/PosSidebar'
 import PosProductos from '../../components/pos/PosProductos'
 import PosResumen from '../../components/pos/PosResumen'
 import PosExito from '../../components/pos/PosExito'
-import VentasTurno from '../../components/pos/VentasTurno'
+import VentasDia from '../../components/pos/VentasDia'
 import VentaDetalle from '../../components/pos/VentaDetalle'
 import Toast from '../../components/ui/Toast'
 import { useAviso } from '../../components/ui/useAviso'
 import { productoConPrecio } from '../../components/ui/format'
-import { CARRITO_INICIAL } from '../../data/menu'
 import { totalDe } from '../../data/precios'
 import { crearVenta } from '../../data/ventas'
 import { registrarVenta, useEstado } from '../../services/estado'
@@ -18,7 +17,7 @@ function CajeroHome({ session, onLogout }) {
   const [vista, setVista] = useState('pos')
   const [busqueda, setBusqueda] = useState('')
   const [categoria, setCategoria] = useState('Todos')
-  const [carrito, setCarrito] = useState(CARRITO_INICIAL)
+  const [carrito, setCarrito] = useState([])
   const [metodoPago, setMetodoPago] = useState('efectivo')
   const [recibido, setRecibido] = useState('')
   const [mensaje, mostrarAviso, cerrarAviso] = useAviso()
@@ -28,7 +27,7 @@ function CajeroHome({ session, onLogout }) {
   const carritoVista = useMemo(() => carrito.map(productoConPrecio), [carrito])
   const cobrarRef = useRef(() => {})
 
-  const total = totalDe(carrito)
+  const total = useMemo(() => totalDe(carrito), [carrito])
 
   const filtrados = useMemo(() => {
     const termino = busqueda.trim().toLowerCase()
@@ -182,7 +181,7 @@ function CajeroHome({ session, onLogout }) {
               )}
             </>
           ) : (
-            <VentasTurno
+            <VentasDia
               ventas={ventas}
               onNuevaVenta={irANuevaVenta}
               onVer={verVenta}

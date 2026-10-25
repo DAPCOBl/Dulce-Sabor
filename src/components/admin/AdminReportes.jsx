@@ -5,6 +5,7 @@ import { moneda, diaCorto, isoFecha } from '../../components/ui/format'
 import { IconExport, IconSales, IconTendenciaUp } from '../../components/ui/icons'
 import { METODOS_PAGO } from '../../components/ui/metodos'
 import { BALANCE_MES } from '../../data/admin'
+import { subtotalDe } from '../../data/precios'
 import {
   CAJEROS_SEDE,
   VENTAS_SEDE,
@@ -142,7 +143,7 @@ function AdminReportes() {
           }
         }
         acumulado[item.id].cantidad += item.cantidad
-        acumulado[item.id].ingresos += item.precio * item.cantidad
+        acumulado[item.id].ingresos += subtotalDe(item)
       })
     })
     return Object.values(acumulado)
@@ -260,7 +261,7 @@ function AdminReportes() {
         <Kpi
           etiqueta="Ventas"
           valor={ventasTotales}
-          nota="Todos los cajeros y turnos"
+          nota="Todos los cajeros"
         />
         <Kpi
           destacado

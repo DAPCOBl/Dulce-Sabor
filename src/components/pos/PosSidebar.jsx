@@ -45,7 +45,7 @@ function PosSidebar({
 
   const seccionesRender = secciones || [
     { id: 'pos', etiqueta: 'Registro de ventas', Icono: IconPos },
-    { id: 'turno', etiqueta: 'Ventas del turno', Icono: IconSales },
+    { id: 'ventas', etiqueta: 'Ventas del día', Icono: IconSales },
   ]
 
   return (

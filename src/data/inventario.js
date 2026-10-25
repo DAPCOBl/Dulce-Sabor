@@ -1,11 +1,11 @@
-import { PRODUCTOS_CATALOGO } from './productos'
+import { PRODUCTOS_CATALOGO, CATEGORIAS } from './productos'
 
 // Catálogo de existencias del módulo de inventario. Las existencias salen del
 // mismo catálogo que venden el punto de venta y administra el administrador:
 // cada producto conserva su id para que el stock se mantenga sincronizado.
-export const CATEGORIAS_INVENTARIO = ['Pan dulce', 'Pasteles', 'Saldados', 'Bebidas']
+export const CATEGORIAS_INVENTARIO = CATEGORIAS
 
-export const RESPONSABLES_INVENTARIO = ['María García', 'Renzo', 'Ana López']
+export const RESPONSABLES_INVENTARIO = ['María García', 'Renzo Soto', 'Ana López']
 
 export const INVENTARIO = PRODUCTOS_CATALOGO.map((producto) => ({
   id: producto.id,
@@ -29,7 +29,7 @@ export const MOTIVOS_AJUSTE = [
   'Conteo físico',
   'Merma por caducidad',
   'Error de registro',
-  'Producto damaged',
+  'Producto dañado',
 ]
 
 export const TIPOS_MOVIMIENTO = {
@@ -39,7 +39,7 @@ export const TIPOS_MOVIMIENTO = {
   merma: { etiqueta: 'Merma', clase: 'merma' },
 }
 
-// Historial semilla del turno: alimenta la tabla de movimientos recientes.
+// Historial semilla del día: alimenta la tabla de movimientos recientes.
 export const MOVIMIENTOS_INICIALES = [
   {
     id: 'mov-1',
@@ -103,7 +103,7 @@ export const MOVIMIENTOS_INICIALES = [
     sku: 'BEB-001',
     cambio: 10,
     saldo: 22,
-    responsable: 'Renzo',
+    responsable: 'Renzo Soto',
     motivo: 'Proveedor',
   },
   {
@@ -129,7 +129,7 @@ export const MOVIMIENTOS_INICIALES = [
     sku: 'PAN-004',
     cambio: 18,
     saldo: 14,
-    responsable: 'Renzo',
+    responsable: 'Renzo Soto',
     motivo: 'Producción de la mañana',
   },
   {
@@ -155,7 +155,7 @@ export const MOVIMIENTOS_INICIALES = [
     sku: 'PAN-002',
     cambio: 15,
     saldo: 10,
-    responsable: 'Renzo',
+    responsable: 'Renzo Soto',
     motivo: 'Proveedor',
   },
 ]

@@ -3,7 +3,8 @@ import Modal, { ModalDatos, ModalFila, ModalItems, ModalTotal } from '../ui/Moda
 import { IconImprimir, IconSales } from '../ui/icons'
 import { formatFecha, fechaDiaMes, moneda } from '../ui/format'
 import { metodoDePago } from '../ui/metodos'
-import { TURNO } from '../../data/ventas'
+import { DATOS_SEDE } from '../../data/ventas'
+import { subtotalDe } from '../../data/precios'
 import './ventas.css'
 
 // Componente unificado para el comprobante de una venta. Se usa tanto en el
@@ -44,9 +45,7 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
         <ModalDatos>
           <ModalFila etiqueta="Hora">{venta.hora}</ModalFila>
           <ModalFila etiqueta="Cajero">{venta.cajero ?? cajero}</ModalFila>
-          <ModalFila etiqueta="Caja / Turno">
-            {venta.caja} · {venta.turno}
-          </ModalFila>
+
           <ModalFila etiqueta="Método de pago">
             <IconoMetodo width="15" height="15" />
             {metodo.etiqueta}
@@ -56,7 +55,7 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
         <ModalItems
           items={venta.items}
           renderDetalle={(item) => `${item.cantidad} unidades × ${moneda(item.precio)}`}
-          subtotales={(item) => moneda(item.precio * item.cantidad)}
+          subtotales={(item) => moneda(subtotalDe(item))}
         />
 
         <ModalTotal etiqueta="Total de la venta">
@@ -92,17 +91,17 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
           </span>
         </ModalFila>
         <ModalFila etiqueta="Cajero">{cajero ?? venta.cajero}</ModalFila>
-        <ModalFila etiqueta="Sucursal">{TURNO.sucursal}</ModalFila>
+        <ModalFila etiqueta="Sucursal">{DATOS_SEDE.sucursal}</ModalFila>
       </ModalDatos>
 
       <ModalItems
         items={venta.items}
-        renderDetalle={(item) => `${item.cantidad} × ${moneda(item.precio)} ${TURNO.moneda}`}
-        subtotales={(item) => moneda(item.precio * item.cantidad)}
+        renderDetalle={(item) => `${item.cantidad} × ${moneda(item.precio)} ${DATOS_SEDE.moneda}`}
+        subtotales={(item) => moneda(subtotalDe(item))}
       />
 
       <ModalTotal etiqueta="Total de la venta">
-        {moneda(venta.importe)} <em>{TURNO.moneda}</em>
+        {moneda(venta.importe)} <em>{DATOS_SEDE.moneda}</em>
       </ModalTotal>
     </Modal>
   )

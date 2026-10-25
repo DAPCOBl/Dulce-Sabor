@@ -1,5 +1,3 @@
-export const SEDE = 'Sede principal'
-
 // Cierre del día a nivel de sede, antes de los cobros de la sesión en curso.
 // Los cobros del punto de venta se suman encima en vivo (ver services/estado.js).
 export const RESUMEN_DIA = {
@@ -23,20 +21,3 @@ export const BALANCE_MES = {
   costoProductosVendidos: 74200,
   gastosOperativos: 22070,
 }
-
-// La primera notificación se arma en vivo con el inventario real
-// (ver pages/admin/AdminHome.jsx); estas son las fijas de la sede.
-export const NOTIFICACIONES = [
-  {
-    id: 'n2',
-    tipo: 'exito',
-    titulo: 'Ventas por encima del objetivo',
-    detalle: '+12,4% Frente al mes anterior',
-  },
-  {
-    id: 'n3',
-    tipo: 'info',
-    titulo: 'Reporte mensual listo',
-    detalle: 'Balance del 1 al 20 de octubre',
-  },
-]

@@ -1,5 +1,6 @@
 import { IconArrow, IconCash, IconCard, IconEmptyCart, IconMinus, IconPlus, IconSuccess, IconTrash } from '../ui/icons'
 import { moneda } from '../ui/format'
+import { subtotalDe } from '../../data/precios'
 
 function PosResumen({
   carrito,
@@ -67,7 +68,7 @@ function PosResumen({
                     <IconPlus width="14" height="14" />
                   </button>
                 </div>
-                <p className="item__subtotal">{moneda(item.precio * item.cantidad)}</p>
+                <p className="item__subtotal">{moneda(subtotalDe(item))}</p>
               </div>
             </article>
           ))

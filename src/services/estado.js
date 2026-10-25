@@ -3,16 +3,16 @@ import { productoConPrecio } from '../components/ui/format'
 import { INVENTARIO, MOVIMIENTOS_INICIALES } from '../data/inventario'
 import { PRODUCTOS } from '../data/menu'
 import { prefijoDeCategoria } from '../data/productos'
-import { VENTAS_TURNO } from '../data/ventas'
+import { VENTAS_INICIALES } from '../data/ventas'
 
 // Estado compartido entre el rol de cajero (punto de venta) y el de
 // administrador (resumen del negocio). Es la única fuente de verdad para
 // el ledger de ventas y el inventario.
 const CAJERO_SEMILLA = 'Ana López'
-const ESTADO_KEY = 'dulcesabor:estado:v1'
+const ESTADO_KEY = 'dulcesabor:estado:v2'
 
 const ESTADO_INICIAL = {
-  ventas: VENTAS_TURNO.map((venta) => ({
+  ventas: VENTAS_INICIALES.map((venta) => ({
     ...venta,
     cajero: CAJERO_SEMILLA,
   })),
@@ -41,7 +41,6 @@ const CAMPOS_EDITABLES = [
   'nombre',
   'sku',
   'categoria',
-  'unidad',
   'precio',
   'coste',
   'stock',

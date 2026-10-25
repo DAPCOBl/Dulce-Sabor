@@ -36,7 +36,7 @@ function ProductosTabla({
         <div>
           <h2 className="admin__tarjeta-titulo">Productos</h2>
           <p className="admin__tarjeta-sub">
-            Precios, presentaciones y disponibilidad del catálogo · {total} productos
+            Precios y disponibilidad del catálogo · {total} productos
           </p>
         </div>
       </header>

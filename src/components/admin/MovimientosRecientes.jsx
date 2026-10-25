@@ -11,7 +11,7 @@ function MovimientosRecientes({ movimientos }) {
         </div>
         <span className="admin__borrador admin__borrador--neutro">
           <IconHistorial width="15" height="15" />
-          {movimientos.length} del turno
+          {movimientos.length} del día
         </span>
       </header>
 

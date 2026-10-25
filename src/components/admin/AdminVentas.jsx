@@ -101,7 +101,7 @@ function AdminVentas() {
           etiqueta="Ventas"
           valor={resumen.ventas}
           icono={<IconSuccess width="17" height="17" />}
-          nota="Todos los cajeros · Todos los turnos"
+          nota="Todos los cajeros"
         />
       </section>
 
@@ -157,7 +157,7 @@ function AdminVentas() {
                 <tr>
                   <th>Hora</th>
                   <th>Folio</th>
-                  <th>Cajero / Caja</th>
+                  <th>Cajero</th>
                   <th>Pago</th>
                   <th className="admin__col-total">Total COP</th>
                   <th className="admin__col-acciones">Acciones</th>
@@ -175,9 +175,6 @@ function AdminVentas() {
                       <td>
                         <div className="admin__cajero-celda">
                           <p className="admin__cajero-nombre">{venta.cajero}</p>
-                          <p className="admin__cajero-detalle">
-                            {venta.caja} · {venta.turno}
-                          </p>
                         </div>
                       </td>
                       <td>

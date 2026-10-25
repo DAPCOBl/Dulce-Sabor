@@ -4,7 +4,6 @@ import ProductosTabla from '../../components/admin/ProductosTabla'
 import Cabecera from '../../components/ui/Cabecera'
 import { IconPlus } from '../../components/ui/icons'
 import { CATEGORIAS, ESTADOS } from '../../data/productos'
-import { UNIDADES } from '../../data/unidades'
 import {
   alternarEstadoProducto,
   actualizarProducto,
@@ -110,7 +109,7 @@ function AdminProductos() {
       <Cabecera
         miga="Productos"
         titulo="Un catálogo bien cuidado."
-        subtitulo="Administra tus productos, precios y presentaciones desde un mismo lugar."
+        subtitulo="Administra tus productos y precios desde un mismo lugar."
         acciones={
           <button type="button" className="ui__boton ui__boton--primario" onClick={crearNuevo}>
             <IconPlus width="17" height="17" />
@@ -140,7 +139,6 @@ function AdminProductos() {
             producto={seleccionado}
             modo={modo}
             categorias={CATEGORIAS}
-            unidades={UNIDADES}
             estados={ESTADOS}
             catalogo={productos}
             onGuardar={guardar}
