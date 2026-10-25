@@ -20,7 +20,7 @@ src/
 ├── components/   # componentes reutilizables
 ├── pages/        # páginas de la aplicación
 ├── routes/       # definición de rutas
-├── services/     # consumo de la API (api.js)
+├── services/     # estado, usuarios y helpers de datos
 ├── App.jsx       # raíz de la aplicación
 └── main.jsx      # punto de entrada
 ```

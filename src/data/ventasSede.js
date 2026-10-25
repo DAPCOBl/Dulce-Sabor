@@ -670,8 +670,6 @@ export const VENTAS_SEDE = [
   },
 ]
 
-export const HISTORIAL_SEDE = VENTAS_SEDE
-
 // Cajeros que rotan por las cajas de la sede.
 export const CAJEROS_SEDE = ['Ana López', 'Renzo Soto', 'Camila Ríos', 'Diego Martín']
 

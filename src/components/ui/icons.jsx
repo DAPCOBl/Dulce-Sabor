@@ -156,18 +156,6 @@ export function IconEmptyCart(props) {
 
 /* ---------- Catálogo e inventario ---------- */
 
-export function IconBread(props) {
-  return <IconoBase nombre="bread-slice" {...props} />
-}
-
-export function IconCake(props) {
-  return <IconoBase nombre="cake-candles" {...props} />
-}
-
-export function IconCup(props) {
-  return <IconoBase nombre="mug-hot" {...props} />
-}
-
 export function IconProductos(props) {
   return <IconoBase nombre="boxes-stacked" {...props} />
 }

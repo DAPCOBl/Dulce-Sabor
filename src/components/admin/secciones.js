@@ -15,7 +15,3 @@ export const SECCIONES = [
   { id: 'reportes', etiqueta: 'Reportes', Icono: IconReportes },
   { id: 'usuarios', etiqueta: 'Usuarios', Icono: IconUsuarios },
 ]
-
-export function etiquetaDeSeccion(id) {
-  return SECCIONES.find((seccion) => seccion.id === id)?.etiqueta ?? 'Resumen'
-}

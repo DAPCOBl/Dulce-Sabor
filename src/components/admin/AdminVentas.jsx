@@ -15,7 +15,6 @@ import Vacio from '../ui/Vacio'
 import { useAviso } from '../ui/useAviso'
 import {
   CAJEROS_SEDE,
-  HISTORIAL_SEDE,
   VENTAS_SEDE,
   fechaDeVenta,
 } from '../../data/ventasSede'
@@ -60,7 +59,7 @@ function AdminVentas() {
   const filtradas = useMemo(() => {
     const termino = busqueda.trim().toLowerCase()
 
-    return HISTORIAL_SEDE.filter((venta) => {
+    return VENTAS_SEDE.filter((venta) => {
       const coincideCajero = cajero === 'todos' || venta.cajero === cajero
       const coincideMetodo = metodo === 'todos' || venta.metodo === metodo
       const coincideFolio = termino === '' || venta.folio.toLowerCase().includes(termino)

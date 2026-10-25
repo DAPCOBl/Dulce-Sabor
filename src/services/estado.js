@@ -191,16 +191,6 @@ export function registrarVenta(venta, cajero) {
   })
 }
 
-// Vuelve a los datos de demostración (ventas e inventario iniciales).
-export function restablecerEstado() {
-  try {
-    localStorage.removeItem(ESTADO_KEY)
-  } catch {
-    // Sin persistencia: se reinicia igual el estado en memoria.
-  }
-  actualizar(ESTADO_INICIAL)
-}
-
 // Estado de una existencia frente a su mínimo: agotado, bajo o disponible.
 export function estadoDeInventario(producto) {
   if (producto.stock <= 0) return 'agotado'

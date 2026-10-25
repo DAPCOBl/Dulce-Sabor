@@ -121,10 +121,6 @@ export function useUsuarios() {
   return useSyncExternalStore(suscribir, getUsuarios, getUsuarios)
 }
 
-export function getUsuarioPorId(id) {
-  return usuarios.find((usuario) => usuario.id === id) ?? null
-}
-
 export function crearUsuario(datos) {
   const nuevo = {
     ...datos,
@@ -188,13 +184,4 @@ export function eliminarUsuario(id, usuarioActualId) {
 
   actualizar(usuarios.filter((item) => item.id !== id))
   return true
-}
-
-export function restablecerUsuarios() {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    // Sin persistencia: se reinicia igual el estado en memoria.
-  }
-  actualizar(USUARIOS_INICIALES)
 }

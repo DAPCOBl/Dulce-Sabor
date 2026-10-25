@@ -235,27 +235,6 @@ export const PRODUCTOS_CATALOGO = [
   },
 ]
 
-// Imágenes disponibles en el catálogo. La imagen es obligatoria para todo
-// producto: si no se indica una, se usa la correspondiente a su categoría.
-export const IMAGENES_PRODUCTOS = [
-  '/productos/Capuchinno.png',
-  '/productos/Croissant.png',
-  '/productos/Muffin de arandanos.png',
-  '/productos/Rol de canela.png',
-  '/productos/Tarta de Fresa.png',
-  '/productos/Torta de chocolate.png',
-]
-
-export const IMAGEN_POR_CATEGORIA = {
-  'Pan dulce': '/productos/Croissant.png',
-  Pasteles: '/productos/Torta de chocolate.png',
-  Saldados: '/productos/Croissant.png',
-  Bebidas: '/productos/Capuchinno.png',
-}
-
-export const IMAGEN_PREDETERMINADA = '/productos/Croissant.png'
-
-
 export function prefijoDeCategoria(categoria) {
   return PREFIJOS[categoria] ?? 'PRD'
 }

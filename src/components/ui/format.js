@@ -71,12 +71,6 @@ export function formatFecha(date) {
   return `${dia}, ${date.getDate()} de ${mes} de ${date.getFullYear()}`
 }
 
-// Fecha con hora para la barra superior: Mié, 21 oct 2026 - 10:38
-export function fechaHoraCorta(date) {
-  const hora = formatHora(date)
-  return `${DIAS_CORTOS[date.getDay()]}, ${date.getDate()} ${MESES_CORTOS[date.getMonth()]} ${date.getFullYear()} - ${hora}`
-}
-
 // Fecha sin hora: 21 oct 2026
 export function fechaDiaMes(date) {
   return `${date.getDate()} ${MESES_CORTOS[date.getMonth()]} ${date.getFullYear()}`
@@ -85,16 +79,6 @@ export function fechaDiaMes(date) {
 // Etiqueta corta de un día de la serie: Mié 21
 export function diaCorto(date) {
   return `${DIAS_CORTOS[date.getDay()]} ${date.getDate()}`
-}
-
-// Periodo del balance: 1 al 21 de octubre de 2026
-export function periodoMes(date) {
-  return `1 al ${date.getDate()} de ${MESES[date.getMonth()]} de ${date.getFullYear()}`
-}
-
-// Periodo corto del balance: 1-20 oct 2026
-export function periodoMesCorto(date) {
-  return `1-${date.getDate()} ${MESES_CORTOS[date.getMonth()]} ${date.getFullYear()}`
 }
 
 // Comparación contra el mismo tramo del mes anterior: 1-20 sep
@@ -123,9 +107,4 @@ export function saludo(date) {
 // Primera palabra del nombre del usuario.
 export function primerNombre(nombre = '') {
   return nombre.trim().split(' ')[0] ?? ''
-}
-
-export function capitalizar(texto = '') {
-  if (!texto) return ''
-  return texto.charAt(0).toUpperCase() + texto.slice(1)
 }
