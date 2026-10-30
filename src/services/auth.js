@@ -1,45 +1,46 @@
-import { getUsuarios } from './usuarios'
+import { apiRequest, ApiError } from './api.js'
+import { clearSession, getSession, publicUser, saveSession } from './session.js'
 
-const SESSION_KEY = 'dulcesabor:session'
+export { getSession } from './session.js'
 
-// Credenciales de demostración (solo frontend).
-// Reemplazar por un login real contra el backend antes de producción.
-// Las cuentas se gestionan desde el módulo de Usuarios (services/usuarios.js).
-
-export function login(email, password) {
-  const user = getUsuarios().find(
-    (candidate) =>
-      candidate.email === email.trim().toLowerCase() &&
-      candidate.password === password &&
-      candidate.estado === 'Activo',
-  )
-
-  if (!user) {
-    return { ok: false, error: 'Correo o contraseña incorrectos.' }
+export async function login(email, password) {
+  const data = await apiRequest('/auth/login', { method: 'POST', auth: false,
+    body: { email: email.trim().toLowerCase(), password } })
+  if (typeof data.expiresIn !== 'number' || data.expiresIn <= 0 || data.expiresIn > 86400) {
+    throw new ApiError('El servidor devolvió una sesión inválida.', 502)
   }
-
-  const session = { user: { id: user.id, nombre: user.nombre, email: user.email, rol: user.rol } }
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-  return { ok: true, session }
-}
-
-export function getSession() {
   try {
-    const raw = localStorage.getItem(SESSION_KEY)
-    if (!raw) return null
-    const session = JSON.parse(raw)
-    if (!session?.user?.rol) return null
-    return session
+    const session = saveSession({ token: data.token, user: data.user,
+      expiresAt: Date.now() + Math.floor(data.expiresIn * 1000) })
+    return { ok: true, session }
   } catch {
-    return null
+    throw new ApiError('El servidor devolvió una sesión inválida.', 502)
   }
 }
 
-export function logout() {
-  localStorage.removeItem(SESSION_KEY)
+export async function validateSession({ signal } = {}) {
+  const current = getSession()
+  if (!current) return null
+  const data = await apiRequest('/auth/me', { token: current.token, signal })
+  if (signal?.aborted || getSession()?.token !== current.token) return null
+  try { return saveSession({ ...current, user: publicUser(data.user) }) } catch {
+    throw new ApiError('El servidor devolvió un usuario inválido.', 502)
+  }
+}
+
+export async function logout() {
+  const current = getSession()
+  if (!current) { clearSession(); return }
+  let reason = 'logout'
+  try {
+    await apiRequest('/auth/logout', { method: 'POST', token: current.token })
+  } catch (error) {
+    if (error.status !== 401) reason = 'logout-offline'
+  } finally {
+    clearSession(reason, current.token)
+  }
 }
 
 export function isAdministrador(session) {
   return session?.user?.rol === 'administrador'
 }
-

@@ -1,19 +1,26 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { IconArrow, IconEye, IconEyeOff, IconLock, IconMail } from './ui/icons'
 import { login } from '../services/auth'
 
 const EMAIL_REMEMBER_KEY = 'dulcesabor:email'
 
-function LoginForm({ onLogin }) {
-  const [email, setEmail] = useState(() => localStorage.getItem(EMAIL_REMEMBER_KEY) ?? '')
+function LoginForm() {
+  const [email, setEmail] = useState(() => {
+    try { return localStorage.getItem(EMAIL_REMEMBER_KEY) ?? '' } catch { return '' }
+  })
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
   const [errors, setErrors] = useState({})
   const [loginError, setLoginError] = useState('')
 
-  function handleSubmit(event) {
+  const [submitting, setSubmitting] = useState(false)
+  const [recovery, setRecovery] = useState(false)
+  const pendingRef = useRef(false)
+
+  async function handleSubmit(event) {
     event.preventDefault()
+    if (pendingRef.current) return
 
     const nextErrors = {}
     if (!email.trim()) {
@@ -29,24 +36,26 @@ function LoginForm({ onLogin }) {
     setLoginError('')
     if (Object.keys(nextErrors).length > 0) return
 
-    if (remember) {
-      localStorage.setItem(EMAIL_REMEMBER_KEY, email.trim())
-    } else {
-      localStorage.removeItem(EMAIL_REMEMBER_KEY)
-    }
-
-    const result = login(email.trim(), password)
-    if (!result.ok) {
+    pendingRef.current = true
+    setSubmitting(true)
+    try {
+      await login(email, password)
+      try {
+        if (remember) localStorage.setItem(EMAIL_REMEMBER_KEY, email.trim().toLowerCase())
+        else localStorage.removeItem(EMAIL_REMEMBER_KEY)
+      } catch { /* Recordar correo es opcional. */ }
       setPassword('')
-      setLoginError(result.error)
-      return
+    } catch (error) {
+      setPassword('')
+      setLoginError(error.message)
+    } finally {
+      pendingRef.current = false
+      setSubmitting(false)
     }
-
-    onLogin(result.session)
   }
 
   return (
-    <form className="form" onSubmit={handleSubmit} noValidate>
+    <form className="form" onSubmit={handleSubmit} noValidate aria-busy={submitting}>
       <div className="form__field">
         <label className="form__label" htmlFor="email">
           Correo electrónico
@@ -59,13 +68,16 @@ function LoginForm({ onLogin }) {
             id="email"
             name="email"
             type="email"
-            autoComplete="email"
+            autoComplete="username"
+            disabled={submitting}
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? 'email-error' : undefined}
             placeholder="correo@dulcesabor.com"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />
         </div>
-        {errors.email && <p className="form__error">{errors.email}</p>}
+        {errors.email && <p id="email-error" className="form__error">{errors.email}</p>}
       </div>
 
       <div className="form__field">
@@ -81,6 +93,9 @@ function LoginForm({ onLogin }) {
             name="password"
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
+            disabled={submitting}
+            aria-invalid={Boolean(errors.password)}
+            aria-describedby={errors.password ? 'password-error' : undefined}
             placeholder="••••••••"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -94,7 +109,7 @@ function LoginForm({ onLogin }) {
             {showPassword ? <IconEyeOff /> : <IconEye />}
           </button>
         </div>
-        {errors.password && <p className="form__error">{errors.password}</p>}
+        {errors.password && <p id="password-error" className="form__error">{errors.password}</p>}
       </div>
 
       <div className="form__options">
@@ -102,17 +117,19 @@ function LoginForm({ onLogin }) {
           <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
           Recordar correo
         </label>
-        <a className="form__link" href="#recuperar">
+        <button className="form__link" type="button" onClick={() => setRecovery(value => !value)} aria-expanded={recovery} aria-controls="recovery-help">
           ¿Olvidaste tu contraseña?
-        </a>
+        </button>
       </div>
 
-      <button className="form__submit" type="submit">
-        Iniciar sesión
+      {recovery && <p id="recovery-help" className="form__help" role="status">Solicita al administrador que restablezca tu contraseña.</p>}
+
+      <button className="form__submit" type="submit" disabled={submitting}>
+        {submitting ? 'Ingresando…' : 'Iniciar sesión'}
         <IconArrow />
       </button>
 
-      {loginError && <p className="form__error form__error--general">{loginError}</p>}
+      {loginError && <p className="form__error form__error--general" role="alert">{loginError}</p>}
     </form>
   )
 }

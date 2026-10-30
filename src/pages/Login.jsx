@@ -2,7 +2,7 @@ import BrandPanel from '../components/BrandPanel'
 import LoginForm from '../components/LoginForm'
 import './Login.css'
 
-function Login({ onLogin }) {
+function Login({ message }) {
   return (
     <main className="login">
       <BrandPanel />
@@ -14,7 +14,8 @@ function Login({ onLogin }) {
             <p className="login__subtitle">Ingresa con tu cuenta para comenzar el día.</p>
           </header>
 
-          <LoginForm onLogin={onLogin} />
+          {message && <p className="login__notice" role="status">{message}</p>}
+          <LoginForm />
         </div>
 
         <footer className="login__footer">Dulce Sabor · Hecho con cariño</footer>
