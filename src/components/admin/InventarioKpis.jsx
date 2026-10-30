@@ -1,7 +1,7 @@
 import Kpi from '../ui/Kpi'
 import { IconInventario, IconWarning } from '../ui/icons'
 
-function InventarioKpis({ productos }) {
+function InventarioKpis({ productos, resumen }) {
   const alertas = productos.filter((producto) => producto.estado !== 'disponible')
   const bajos = alertas.filter((producto) => producto.estado === 'bajo')
   const agotados = alertas.filter((producto) => producto.estado === 'agotado')
@@ -11,7 +11,7 @@ function InventarioKpis({ productos }) {
       <Kpi
         oscuro
         etiqueta="Productos en alerta"
-        valor={alertas.length}
+        valor={resumen.enAlerta}
         unidad="productos"
         icono={<IconWarning width="17" height="17" />}
         meta={<span>Stock igual o menor al mínimo</span>}
@@ -19,7 +19,7 @@ function InventarioKpis({ productos }) {
 
       <Kpi
         etiqueta="Stock bajo"
-        valor={bajos.length}
+        valor={resumen.bajos}
         unidad="PRODUCTOS"
         icono={<IconInventario width="17" height="17" />}
         extra={
@@ -35,7 +35,7 @@ function InventarioKpis({ productos }) {
 
       <Kpi
         etiqueta="Agotados"
-        valor={agotados.length}
+        valor={resumen.agotados}
         unidad="producto"
         icono={<IconWarning width="17" height="17" />}
         extra={

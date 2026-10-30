@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Modal from '../ui/Modal'
 import { IconArrow, IconInfo, IconSuccess } from '../ui/icons'
-import { MOTIVOS_AJUSTE, MOTIVOS_ENTRADA, RESPONSABLES_INVENTARIO } from '../../data/inventario'
 
 const CANTIDAD_INICIAL = 12
 
@@ -9,15 +8,17 @@ function RegistroMovimiento({
   productos,
   session,
   productoId,
-  productoPorDefecto,
+  opciones,
   onProductoChange,
   onRegistrar,
   onCerrar,
 }) {
   const [tipo, setTipo] = useState('entrada')
   const [cantidad, setCantidad] = useState(CANTIDAD_INICIAL)
-  const [motivo, setMotivo] = useState(MOTIVOS_ENTRADA[0])
-  const [responsable, setResponsable] = useState(session.user.nombre)
+  const [motivo, setMotivo] = useState(opciones.motivosEntrada[0])
+  const [error, setError] = useState('')
+  const [guardando, setGuardando] = useState(false)
+  const pendingRef = useRef(false)
   const [exito, setExito] = useState(null)
 
   const campoProductoRef = useRef(null)
@@ -30,47 +31,56 @@ function RegistroMovimiento({
   const stockActual = producto?.stock ?? 0
   const unidades = Math.max(Math.round(Number(cantidad) || 0), 0)
   const nuevoStock = tipo === 'entrada' ? stockActual + unidades : unidades
-  const motivos = tipo === 'entrada' ? MOTIVOS_ENTRADA : MOTIVOS_AJUSTE
+  const motivos = tipo === 'entrada' ? opciones.motivosEntrada : opciones.motivosAjuste
 
   function cambiarTipo(siguiente) {
+    if (guardando) return
     setTipo(siguiente)
-    setMotivo(siguiente === 'entrada' ? MOTIVOS_ENTRADA[0] : MOTIVOS_AJUSTE[0])
+    setMotivo(siguiente === 'entrada' ? opciones.motivosEntrada[0] : opciones.motivosAjuste[0])
     setCantidad(siguiente === 'entrada' ? CANTIDAD_INICIAL : stockActual)
     setExito(null)
   }
 
   function elegirProducto(id) {
+    if (guardando) return
+    if (tipo === 'ajuste') setCantidad(productos.find(item => item.id === id)?.stock ?? 0)
     onProductoChange(id)
     setExito(null)
   }
 
-  function guardar(evento) {
+  async function guardar(evento) {
     evento.preventDefault()
-    const movimiento = onRegistrar({
+    if (pendingRef.current) return
+    setError('')
+    const numero = Number(cantidad)
+    if (String(cantidad).trim() === '' || !Number.isInteger(numero) || numero < (tipo === 'entrada' ? 1 : 0)) { setError('Escribe una cantidad entera válida.'); return }
+    pendingRef.current = true; setGuardando(true)
+    try {
+    const movimiento = await onRegistrar({
       productoId,
-      cantidad: unidades,
+      cantidad: numero,
       tipo,
       motivo,
-      responsable,
     })
 
     if (!movimiento) return
 
-    setExito({ ...movimiento, stockAnterior: stockActual })
+    setExito(movimiento)
     setCantidad(tipo === 'entrada' ? CANTIDAD_INICIAL : movimiento.saldo)
+    } catch (error) { setError(error.message) }
+    finally { pendingRef.current = false; setGuardando(false) }
   }
 
   function cancelar() {
-    onProductoChange(productoPorDefecto)
     setCantidad(CANTIDAD_INICIAL)
-    setMotivo(tipo === 'entrada' ? MOTIVOS_ENTRADA[0] : MOTIVOS_AJUSTE[0])
+    setMotivo(tipo === 'entrada' ? opciones.motivosEntrada[0] : opciones.motivosAjuste[0])
     setExito(null)
-    onCerrar?.()
+    if (!guardando) onCerrar?.()
   }
 
   return (
     <Modal
-      onCerrar={onCerrar}
+      onCerrar={() => { if (!guardando) onCerrar() }}
       titulo={tipo === 'entrada' ? 'Registrar entrada' : 'Registrar ajuste'}
       subtitulo={
         tipo === 'entrada'
@@ -103,10 +113,13 @@ function RegistroMovimiento({
         </button>
       </div>
 
+      {error && <p className="ui__request-error" role="alert">{error}</p>}
       <form className="admin__form" onSubmit={guardar}>
+        <fieldset className="ui__fieldset" disabled={guardando}>
         <label className="admin__campo">
           <span className="admin__campo-label">Producto</span>
           <select
+            aria-label="Producto"
             ref={campoProductoRef}
             className="admin__control admin__select"
             value={productoId}
@@ -125,6 +138,7 @@ function RegistroMovimiento({
             <span className="admin__campo-label">Cantidad</span>
             <input
               className="admin__control"
+              aria-label="Cantidad"
               type="number"
               min="0"
               step="1"
@@ -143,6 +157,7 @@ function RegistroMovimiento({
           <span className="admin__campo-label">Motivo</span>
           <select
             className="admin__control admin__select"
+            aria-label="Motivo"
             value={motivo}
             onChange={(evento) => setMotivo(evento.target.value)}
           >
@@ -156,17 +171,7 @@ function RegistroMovimiento({
 
         <label className="admin__campo">
           <span className="admin__campo-label">Responsable</span>
-          <select
-            className="admin__control admin__select"
-            value={responsable}
-            onChange={(evento) => setResponsable(evento.target.value)}
-          >
-            {RESPONSABLES_INVENTARIO.map((opcion) => (
-              <option key={opcion} value={opcion}>
-                {opcion}
-              </option>
-            ))}
-          </select>
+          <input className="admin__control" value={session.user.nombre} readOnly />
         </label>
 
         <div className="admin__cambio">
@@ -209,10 +214,11 @@ function RegistroMovimiento({
           <button type="button" className="ui__boton ui__boton--secundario" onClick={cancelar}>
             Cancelar
           </button>
-          <button type="submit" className="ui__boton ui__boton--primario">
-            {tipo === 'entrada' ? 'Guardar entrada' : 'Guardar ajuste'}
+          <button disabled={guardando} type="submit" className="ui__boton ui__boton--primario">
+            {guardando ? 'Guardando…' : tipo === 'entrada' ? 'Guardar entrada' : 'Guardar ajuste'}
           </button>
         </div>
+        </fieldset>
       </form>
     </Modal>
   )

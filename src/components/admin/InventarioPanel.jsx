@@ -1,126 +1,53 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import ExistenciasInventario from './ExistenciasInventario'
 import InventarioKpis from './InventarioKpis'
 import MovimientosRecientes from './MovimientosRecientes'
 import RegistroMovimiento from './RegistroMovimiento'
 import Cabecera from '../ui/Cabecera'
+import Paginacion from '../ui/Paginacion'
+import RemoteStatus from '../ui/RemoteStatus'
 import { IconPlus } from '../ui/icons'
-import { estadoDeInventario, registrarMovimiento, useEstado } from '../../services/estado'
+import { useRemote } from '../../hooks/useRemote'
+import { hoyColombia } from '../../utils/fechas'
+import { listarInventario, inventarioCompleto, opcionesInventario, resumenInventario, alertasInventario, listarMovimientos, registrarMovimiento } from '../../services/inventario'
 import './inventario.css'
 
-const POR_PAGINA = 6
-const PRODUCTO_INICIAL = 'p13'
-
 function InventarioPanel({ session }) {
-  const { inventario, movimientos } = useEstado()
   const [filtros, setFiltros] = useState({ busqueda: '', categoria: 'todas', estado: 'todos' })
   const [pagina, setPagina] = useState(1)
-  const [productoInicial, setProductoInicial] = useState(PRODUCTO_INICIAL)
+  const [movPagina, setMovPagina] = useState(1)
+  const [dia, setDia] = useState(hoyColombia)
+  const [productoId, setProductoId] = useState('')
   const [modalAbierto, setModalAbierto] = useState(false)
-  const [claveRegistro, setClaveRegistro] = useState(0)
-
-  const productos = useMemo(
-    () => inventario.map((producto) => ({ ...producto, estado: estadoDeInventario(producto) })),
-    [inventario],
-  )
-
-  const filtrados = useMemo(() => {
-    const texto = filtros.busqueda.trim().toLowerCase()
-
-    return productos.filter((producto) => {
-      const coincideTexto =
-        texto === '' ||
-        producto.nombre.toLowerCase().includes(texto) ||
-        producto.sku.toLowerCase().includes(texto)
-      const coincideCategoria =
-        filtros.categoria === 'todas' || producto.categoria === filtros.categoria
-      const coincideEstado = filtros.estado === 'todos' || producto.estado === filtros.estado
-
-      return coincideTexto && coincideCategoria && coincideEstado
-    })
-  }, [productos, filtros])
-
-  const paginas = Math.max(Math.ceil(filtrados.length / POR_PAGINA), 1)
-  // La página se recorta al total filtrado para no quedar fuera de rango.
-  const paginaActual = Math.min(pagina, paginas)
-  const visibles = filtrados.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
-
-  function cambiarFiltro(campo, valor) {
-    setFiltros((anterior) => ({ ...anterior, [campo]: valor }))
-    setPagina(1)
-  }
-
-  function elegirProducto(producto) {
-    setProductoInicial(producto.id)
-    setModalAbierto(true)
-    setClaveRegistro((contador) => contador + 1)
-  }
-
-  function activarRegistro() {
-    setModalAbierto(true)
-    setClaveRegistro((contador) => contador + 1)
-  }
-
-  function cerrarModal() {
-    setModalAbierto(false)
-    setProductoInicial(PRODUCTO_INICIAL)
-  }
-
-  function guardarMovimiento(datos) {
-    return registrarMovimiento(datos)
-  }
-
-  return (
-    <div className="admin__inventario">
-      <Cabecera
-        miga="Inventario"
-        titulo="Cada pieza, en su lugar."
-        subtitulo="Consulta existencias, atiende alertas y conserva la trazabilidad de cada movimiento."
-        acciones={
-          <button
-            type="button"
-            className="ui__boton ui__boton--primario"
-            onClick={activarRegistro}
-          >
-            <IconPlus width="16" height="16" />
-            Registrar movimiento
-          </button>
-        }
-      />
-
-      <InventarioKpis productos={productos} />
-
-      <div className="admin__inventario-grid">
-        <ExistenciasInventario
-          productos={visibles}
-          total={filtrados.length}
-          porPagina={POR_PAGINA}
-          filtros={filtros}
-          onFiltro={cambiarFiltro}
-          pagina={paginaActual}
-          paginas={paginas}
-          onPagina={setPagina}
-          onElegir={elegirProducto}
-        />
-
-      </div>
-
-      {modalAbierto && (
-        <RegistroMovimiento
-          key={claveRegistro}
-          productos={productos}
-          session={session}
-          productoId={productoInicial}
-          productoPorDefecto={PRODUCTO_INICIAL}
-          onProductoChange={setProductoInicial}
-          onRegistrar={guardarMovimiento}
-          onCerrar={cerrarModal}
-        />
-      )}
-
-      <MovimientosRecientes movimientos={movimientos} />
-    </div>
-  )
+  const contexto = useRemote(async options => {
+    const [productos, opciones, resumen, alertas] = await Promise.all([
+      inventarioCompleto(options), opcionesInventario(options), resumenInventario(options), alertasInventario(options),
+    ])
+    return { productos, opciones, resumen: resumen.resumen, alertas: alertas.alertas }
+  })
+  const listado = useRemote(options => listarInventario({ ...filtros, pagina, porPagina: 6 }, options), [filtros, pagina])
+  const historial = useRemote(options => listarMovimientos({ desde: dia, hasta: dia, pagina: movPagina, porPagina: 10 }, options), [dia, movPagina])
+  function abrir(id) { setProductoId(id || contexto.data?.productos[0]?.id || ''); setModalAbierto(true) }
+  function cambiarFiltro(campo, valor) { setFiltros(actual => ({ ...actual, [campo]: valor })); setPagina(1) }
+  return <div className="admin__inventario">
+    <Cabecera miga="Inventario" titulo="Cada pieza, en su lugar." subtitulo="Existencias y movimientos registrados en tu sede."
+      acciones={<button type="button" className="ui__boton ui__boton--primario" disabled={!contexto.data?.productos.length} onClick={() => abrir()}><IconPlus width="17" height="17" />Registrar movimiento</button>} />
+    <RemoteStatus {...contexto} />
+    {contexto.data && <InventarioKpis productos={contexto.data.alertas} resumen={contexto.data.resumen} />}
+    <RemoteStatus {...listado} />
+    {listado.data && contexto.data && <ExistenciasInventario productos={listado.data.productos} categorias={contexto.data.opciones.categorias}
+      total={listado.data.paginacion.total} porPagina={6} pagina={listado.data.paginacion.pagina} paginas={listado.data.paginacion.paginas}
+      filtros={filtros} onFiltro={cambiarFiltro} onPagina={setPagina} onElegir={producto => abrir(producto.id)} />}
+    <label className="admin__campo">Fecha de movimientos
+      <input type="date" value={dia} onChange={event => { setDia(event.target.value); setMovPagina(1) }} />
+    </label>
+    <RemoteStatus {...historial} />
+    {historial.data && <>
+      <MovimientosRecientes movimientos={historial.data.movimientos} total={historial.data.paginacion.total} />
+      <Paginacion pagina={historial.data.paginacion.pagina} paginas={historial.data.paginacion.paginas} onPagina={setMovPagina} />
+    </>}
+    {modalAbierto && contexto.data && <RegistroMovimiento productos={contexto.data.productos} opciones={contexto.data.opciones}
+      session={session} productoId={productoId} onProductoChange={setProductoId} onRegistrar={registrarMovimiento} onCerrar={() => setModalAbierto(false)} />}
+  </div>
 }
-
 export default InventarioPanel

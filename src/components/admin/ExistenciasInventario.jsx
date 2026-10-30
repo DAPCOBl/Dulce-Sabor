@@ -1,18 +1,12 @@
 import Buscador from '../ui/Buscador'
 import Paginacion from '../ui/Paginacion'
 import { Select } from '../ui/Filtro'
-import { CATEGORIAS_INVENTARIO } from '../../data/inventario'
 
 const ESTADOS_FILTRO = [
   { id: 'todos', etiqueta: 'todos' },
   { id: 'disponible', etiqueta: 'Disponible' },
   { id: 'bajo', etiqueta: 'Bajo' },
   { id: 'agotado', etiqueta: 'Agotado' },
-]
-
-const OPCIONES_CATEGORIA = [
-  { valor: 'todas', etiqueta: 'todas' },
-  ...CATEGORIAS_INVENTARIO.map((categoria) => ({ valor: categoria, etiqueta: categoria })),
 ]
 
 const OPCIONES_ESTADO = ESTADOS_FILTRO.map((estado) => ({
@@ -28,6 +22,7 @@ const ETIQUETA_ESTADO = {
 
 function ExistenciasInventario({
   productos,
+  categorias,
   total,
   porPagina,
   filtros,
@@ -62,7 +57,7 @@ function ExistenciasInventario({
           <Select
             valor={filtros.categoria}
             onChange={(valor) => onFiltro('categoria', valor)}
-            opciones={OPCIONES_CATEGORIA}
+            opciones={[{ valor: 'todas', etiqueta: 'Todas' }, ...categorias.map(categoria => ({ valor: categoria, etiqueta: categoria }))]}
             ariaLabel="Filtrar por categoría"
           />
         </label>

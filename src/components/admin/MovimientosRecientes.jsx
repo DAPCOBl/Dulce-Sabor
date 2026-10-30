@@ -1,7 +1,7 @@
 import { IconHistorial, IconInfo } from '../ui/icons'
-import { TIPOS_MOVIMIENTO } from '../../data/inventario'
+const TIPOS_MOVIMIENTO = { entrada: { etiqueta: 'Entrada', clase: 'entrada' }, ajuste: { etiqueta: 'Ajuste', clase: 'ajuste' }, venta: { etiqueta: 'Venta', clase: 'venta' }, merma: { etiqueta: 'Merma', clase: 'merma' } }
 
-function MovimientosRecientes({ movimientos }) {
+function MovimientosRecientes({ movimientos, total }) {
   return (
     <section className="admin__tarjeta">
       <header className="admin__tarjeta-header">
@@ -11,7 +11,7 @@ function MovimientosRecientes({ movimientos }) {
         </div>
         <span className="admin__borrador admin__borrador--neutro">
           <IconHistorial width="15" height="15" />
-          {movimientos.length} del día
+          {total} del día
         </span>
       </header>
 
