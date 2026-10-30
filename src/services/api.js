@@ -10,7 +10,7 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiRequest(path, { method = 'GET', body, auth = true, token, signal, timeout = 10000 } = {}) {
+export async function apiRequest(path, { method = 'GET', body, auth = true, token, signal, timeout = 10000, headers = {}, responseType = 'json' } = {}) {
   const session = getSession()
   const accessToken = token ?? session?.token
   if (auth && (!accessToken || (accessToken === session?.token && session.expiresAt <= Date.now()))) {
@@ -28,13 +28,16 @@ export async function apiRequest(path, { method = 'GET', body, auth = true, toke
   try {
     const response = await fetch(`${API_URL}${path}`, {
       method,
-      headers: { Accept: 'application/json', ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      headers: { Accept: 'application/json', ...headers, ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
         ...(auth ? { Authorization: `Bearer ${accessToken}` } : {}) },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       signal: controller.signal,
       cache: 'no-store',
     })
     if (response.status === 401 && auth) clearSession('expired', accessToken)
+    if (response.ok && responseType === 'blob') {
+      return { blob: await response.blob(), filename: response.headers.get('Content-Disposition')?.match(/filename="([^"]+)"/)?.[1] ?? 'reporte.csv' }
+    }
     let data
     try { data = await response.json() } catch {
       if (response.status === 401) throw new ApiError('Tu sesión venció. Vuelve a iniciar sesión.', 401)

@@ -1,17 +1,16 @@
-import { useState } from 'react'
 import Modal, { ModalDatos, ModalFila, ModalItems, ModalTotal } from '../ui/Modal'
 import { IconImprimir, IconSales } from '../ui/icons'
 import { formatFecha, fechaDiaMes, moneda } from '../ui/format'
 import { metodoDePago } from '../ui/metodos'
-import { DATOS_SEDE } from '../../data/ventas'
-import { subtotalDe } from '../../data/precios'
+import { DATOS_SEDE } from '../../config/negocio'
+import { subtotalDe } from '../../utils/precios'
 import './ventas.css'
 
 // Componente unificado para el comprobante de una venta. Se usa tanto en el
 // punto de venta (variante "pos") como en el historial de la sede del
 // administrador (variante "admin"), evitando mantener dos modales duplicados.
 function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = 'pos' }) {
-  const [hoy] = useState(() => new Date())
+  const fechaVenta = fecha ?? new Date(venta.fecha)
 
   if (variante === 'admin') {
     const metodo = metodoDePago(venta.metodo)
@@ -21,7 +20,7 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
       <Modal
         onCerrar={onCerrar}
         titulo={`Venta ${venta.folio}`}
-        subtitulo={`Comprobante de venta · ${fechaDiaMes(fecha ?? hoy)}`}
+        subtitulo={`Comprobante de venta · ${fechaDiaMes(fechaVenta)}`}
         icono={<IconSales width="24" height="24" />}
         ancho
         acciones={
@@ -82,7 +81,7 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
       }
     >
       <ModalDatos>
-        <ModalFila etiqueta="Fecha">{formatFecha(fecha ?? hoy)}</ModalFila>
+        <ModalFila etiqueta="Fecha">{formatFecha(fechaVenta)}</ModalFila>
         <ModalFila etiqueta="Hora">{venta.hora}</ModalFila>
         <ModalFila etiqueta="Método de pago">
           <span className={`ventas__metodo ventas__metodo--${venta.metodo}`}>
@@ -90,7 +89,7 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
             {metodo.etiqueta}
           </span>
         </ModalFila>
-        <ModalFila etiqueta="Cajero">{cajero ?? venta.cajero}</ModalFila>
+        <ModalFila etiqueta="Cajero">{venta.cajero ?? cajero}</ModalFila>
         <ModalFila etiqueta="Sucursal">{DATOS_SEDE.sucursal}</ModalFila>
       </ModalDatos>
 

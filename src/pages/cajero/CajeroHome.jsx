@@ -8,26 +8,43 @@ import VentaDetalle from '../../components/pos/VentaDetalle'
 import Toast from '../../components/ui/Toast'
 import { useAviso } from '../../components/ui/useAviso'
 import { productoConPrecio } from '../../components/ui/format'
-import { totalDe } from '../../data/precios'
-import { crearVenta } from '../../data/ventas'
-import { registrarVenta, useEstado } from '../../services/estado'
+import { totalDe } from '../../utils/precios'
+import { cobrarVenta, cobroPendiente, ventasDelDia } from '../../services/ventas'
+import { useRemote } from '../../hooks/useRemote'
+import { catalogoCompleto, opcionesProductos } from '../../services/productos'
+import { invalidarDatos } from '../../services/datos'
+import RemoteStatus from '../../components/ui/RemoteStatus'
 import '../../components/pos/pos.css'
+
+const VACIO = []
 
 function CajeroHome({ session, onLogout }) {
   const [vista, setVista] = useState('pos')
   const [busqueda, setBusqueda] = useState('')
   const [categoria, setCategoria] = useState('Todos')
-  const [carrito, setCarrito] = useState([])
-  const [metodoPago, setMetodoPago] = useState('efectivo')
-  const [recibido, setRecibido] = useState('')
+  const [pendiente, setPendiente] = useState(() => cobroPendiente(session.user.id))
+  const [carrito, setCarrito] = useState(() => cobroPendiente(session.user.id)?.preview ?? [])
+  const [metodoPago, setMetodoPago] = useState(() => cobroPendiente(session.user.id)?.body.metodo ?? 'efectivo')
+  const [recibido, setRecibido] = useState(() => String(cobroPendiente(session.user.id)?.body.recibido ?? ''))
   const [mensaje, mostrarAviso, cerrarAviso] = useAviso()
   const [ventaConfirmada, setVentaConfirmada] = useState(null)
   const [ventaDetalle, setVentaDetalle] = useState(null)
-  const { ventas, productos } = useEstado()
-  const carritoVista = useMemo(() => carrito.map(productoConPrecio), [carrito])
+  const remote = useRemote(async options => {
+    const [productos, opciones, ventas] = await Promise.all([catalogoCompleto(options), opcionesProductos(options), ventasDelDia(options)])
+    return { productos: productos.map(productoConPrecio), opciones, ventas }
+  })
+  const productos = remote.data?.productos ?? VACIO
+  const ventas = remote.data?.ventas ?? VACIO
+  const [cobrando, setCobrando] = useState(false)
+  const cobrandoRef = useRef(false)
+  const confirmadaRef = useRef(null)
+  const carritoVista = useMemo(() => carrito.map(item => {
+    const producto = productos.find(p => p.id === item.id)
+    return productoConPrecio(pendiente || !producto ? item : { ...item, nombre: producto.nombre, precio: producto.precio })
+  }), [carrito, productos, pendiente])
   const cobrarRef = useRef(() => {})
 
-  const total = useMemo(() => totalDe(carrito), [carrito])
+  const total = useMemo(() => totalDe(carritoVista), [carritoVista])
 
   const filtrados = useMemo(() => {
     const termino = busqueda.trim().toLowerCase()
@@ -50,6 +67,7 @@ function CajeroHome({ session, onLogout }) {
   const faltante = Math.max(total - recibidoNumero, 0)
 
   function agregar(producto) {
+    if (cobrandoRef.current || pendiente) return
     cerrarAviso()
     setCarrito((actual) => {
       const existente = actual.find((item) => item.id === producto.id)
@@ -67,6 +85,7 @@ function CajeroHome({ session, onLogout }) {
   }
 
   function cambiarCantidad(id, delta) {
+    if (cobrandoRef.current || pendiente) return
     cerrarAviso()
     setCarrito((actual) =>
       actual
@@ -82,14 +101,15 @@ function CajeroHome({ session, onLogout }) {
   }
 
   function vaciar() {
+    if (cobrandoRef.current || pendiente) return
     setCarrito([])
     setRecibido('')
     cerrarAviso()
   }
 
-  function cobrar() {
-    if (carrito.length === 0 || ventaConfirmada) return
-    if (efectivoInsuficiente) {
+  async function cobrar() {
+    if (carrito.length === 0 || confirmadaRef.current || cobrandoRef.current) return
+    if (efectivoInsuficiente && !pendiente) {
       mostrarAviso(
         recibido.trim() === ''
           ? 'Ingresa el dinero recibido antes de cobrar.'
@@ -98,17 +118,23 @@ function CajeroHome({ session, onLogout }) {
       return
     }
 
-    const venta = crearVenta(ventas, carrito, metodoPago)
-    registrarVenta(venta, session.user.nombre)
-    setVentaConfirmada({
-      ...venta,
-      recibido: metodoPago === 'efectivo' ? recibidoNumero : 0,
-      cambio: metodoPago === 'efectivo' ? Math.max(recibidoNumero - total, 0) : 0,
-    })
-    cerrarAviso()
+    cobrandoRef.current = true; setCobrando(true)
+    try {
+      const body = pendiente?.body ?? { items: carrito.map(({ id, cantidad }) => ({ id, cantidad })), metodo: metodoPago,
+        ...(metodoPago === 'efectivo' ? { recibido: recibidoNumero } : {}) }
+      const venta = await cobrarVenta(session.user.id, body, carritoVista)
+      confirmadaRef.current = venta
+      setPendiente(null); setVentaConfirmada(venta); cerrarAviso()
+    } catch (error) {
+      const actual = cobroPendiente(session.user.id)
+      setPendiente(actual); mostrarAviso(error.message)
+      if (!actual) invalidarDatos()
+    } finally { cobrandoRef.current = false; setCobrando(false) }
   }
 
   function reiniciarVenta() {
+    if (pendiente || cobrandoRef.current) return
+    confirmadaRef.current = null
     setVentaConfirmada(null)
     setCarrito([])
     setRecibido('')
@@ -122,6 +148,7 @@ function CajeroHome({ session, onLogout }) {
 
   function irANuevaVenta() {
     setVista('pos')
+    if (pendiente) { mostrarAviso('Confirma el cobro pendiente antes de iniciar otra venta.'); return }
     if (ventaConfirmada) {
       reiniciarVenta()
       return
@@ -150,11 +177,15 @@ function CajeroHome({ session, onLogout }) {
       <PosSidebar vista={vista} onNavigate={setVista} session={session} onLogout={onLogout} />
 
       <div className="pos__cuerpo">
+        <RemoteStatus {...remote} />
+        {pendiente && <p className="ui__request-error" role="alert">Hay un cobro pendiente de confirmar. Reintenta el cobro para consultar su resultado sin duplicarlo.</p>}
         <div className="pos__area">
-          {vista === 'pos' ? (
+          {remote.data && (vista === 'pos' ? (
             <>
               <PosProductos
                 filtrados={filtrados}
+                categorias={remote.data.opciones.categorias}
+                bloqueado={cobrando || Boolean(pendiente)}
                 onAdd={agregar}
                 busqueda={busqueda}
                 onBusqueda={setBusqueda}
@@ -166,14 +197,16 @@ function CajeroHome({ session, onLogout }) {
                 onCantidad={cambiarCantidad}
                 onVaciar={vaciar}
                 metodoPago={metodoPago}
-                onMetodo={setMetodoPago}
+                onMetodo={value => { if (!pendiente && !cobrandoRef.current) setMetodoPago(value) }}
                 recibido={recibido}
-                onRecibido={setRecibido}
+                onRecibido={value => { if (!pendiente && !cobrandoRef.current) setRecibido(value) }}
                 total={total}
                 cambio={cambio}
                 onCobrar={cobrar}
                 efectivoInsuficiente={efectivoInsuficiente}
                 faltante={faltante}
+                cobrando={cobrando}
+                pendiente={Boolean(pendiente)}
               />
 
               {ventaConfirmada && (
@@ -186,7 +219,7 @@ function CajeroHome({ session, onLogout }) {
               onNuevaVenta={irANuevaVenta}
               onVer={verVenta}
             />
-          )}
+          ))}
 
           {ventaDetalle && (
             <VentaDetalle

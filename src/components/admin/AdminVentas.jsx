@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import {
   IconEye,
   IconSales,
@@ -13,21 +13,14 @@ import Paginacion from '../ui/Paginacion'
 import Toast from '../ui/Toast'
 import Vacio from '../ui/Vacio'
 import { useAviso } from '../ui/useAviso'
-import {
-  CAJEROS_SEDE,
-  VENTAS_SEDE,
-  fechaDeVenta,
-} from '../../data/ventasSede'
+import { listarVentas, resumenVentas, opcionesVentas } from '../../services/ventas'
+import { useRemote } from '../../hooks/useRemote'
+import RemoteStatus from '../ui/RemoteStatus'
 import VentaDetalle from '../pos/VentaDetalle'
 import './adminVentas.css'
 import '../pos/pos.css'
 
 const POR_PAGINA = 4
-
-const OPCIONES_CAJERO = [
-  { valor: 'todos', etiqueta: 'Cajero: todos' },
-  ...CAJEROS_SEDE.map((nombre) => ({ valor: nombre, etiqueta: `Cajero: ${nombre}` })),
-]
 
 const OPCIONES_METODO = [
   { valor: 'todos', etiqueta: 'Pago: todos' },
@@ -38,7 +31,6 @@ const OPCIONES_METODO = [
 ]
 
 function AdminVentas() {
-  const [hoy] = useState(() => new Date())
   const [busqueda, setBusqueda] = useState('')
   const [cajero, setCajero] = useState('todos')
   const [metodo, setMetodo] = useState('todos')
@@ -46,31 +38,18 @@ function AdminVentas() {
   const [detalle, setDetalle] = useState(null)
   const [aviso] = useAviso()
 
-  // Ingresos y ventas del día en curso (los cobros confirmados de la sede).
-  const resumen = useMemo(() => {
-    const delDia = VENTAS_SEDE.filter((venta) => venta.dia === 0)
-    const ingresos = delDia.reduce((acumulado, venta) => acumulado + venta.importe, 0)
-    return {
-      ingresos,
-      ventas: delDia.length,
-    }
-  }, [])
-
-  const filtradas = useMemo(() => {
-    const termino = busqueda.trim().toLowerCase()
-
-    return VENTAS_SEDE.filter((venta) => {
-      const coincideCajero = cajero === 'todos' || venta.cajero === cajero
-      const coincideMetodo = metodo === 'todos' || venta.metodo === metodo
-      const coincideFolio = termino === '' || venta.folio.toLowerCase().includes(termino)
-      return coincideCajero && coincideMetodo && coincideFolio
-    })
-  }, [busqueda, cajero, metodo])
-
-  const paginas = Math.max(1, Math.ceil(filtradas.length / POR_PAGINA))
-  const paginaActual = Math.min(pagina, paginas)
-  const visibles = filtradas.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
-  const totalVisible = filtradas.reduce((acumulado, venta) => acumulado + venta.importe, 0)
+  const remote = useRemote(async options => {
+    const [lista, resumen, opciones] = await Promise.all([
+      listarVentas({ busqueda, cajeroId: cajero, metodo, pagina, porPagina: POR_PAGINA }, options), resumenVentas({}, options), opcionesVentas(options),
+    ])
+    return { ...lista, resumen: resumen.resumen, opciones }
+  }, [busqueda, cajero, metodo, pagina])
+  const resumen = remote.data?.resumen
+  const visibles = remote.data?.ventas ?? []
+  const paginaActual = remote.data?.paginacion.pagina ?? 1
+  const paginas = remote.data?.paginacion.paginas ?? 1
+  const totalVisible = visibles.reduce((total, venta) => total + venta.importe, 0)
+  const opcionesCajero = [{ valor: 'todos', etiqueta: 'Cajero: todos' }, ...(remote.data?.opciones.cajeros ?? []).map(usuario => ({ valor: usuario.id, etiqueta: usuario.nombre }))]
 
   function actualizarFiltro(setter) {
     return (valor) => {
@@ -86,6 +65,8 @@ function AdminVentas() {
         titulo="Todas las ventas de tu sede."
       />
 
+      <RemoteStatus {...remote} />
+      {remote.data && <>
       <section className="ui__kpis ui__kpis--dos" aria-label="Indicadores de ventas">
         <Kpi
           oscuro
@@ -128,7 +109,7 @@ function AdminVentas() {
             onChange={(evento) => actualizarFiltro(setCajero)(evento.target.value)}
             aria-label="Filtrar por cajero"
           >
-            {OPCIONES_CAJERO.map((opcion) => (
+            {opcionesCajero.map((opcion) => (
               <option key={opcion.valor} value={opcion.valor}>
                 {opcion.etiqueta}
               </option>
@@ -210,7 +191,7 @@ function AdminVentas() {
 
 <footer className="admin__listado-pie">
           <p className="ui__paginacion-texto">
-            {`Mostrando ${visibles.length} de ${pluralVentas(filtradas.length)}`}
+            {`Mostrando ${visibles.length} de ${pluralVentas(remote.data.paginacion.total)}`}
           </p>
 
           <Paginacion
@@ -220,7 +201,7 @@ function AdminVentas() {
           />
 
           <span className="admin__listado-total">
-            Total
+            Total de esta página
             <strong>
               {moneda(totalVisible)} COP
             </strong>
@@ -232,11 +213,12 @@ function AdminVentas() {
         <VentaDetalle
           variante="admin"
           venta={detalle}
-          fecha={fechaDeVenta(detalle, hoy)}
+          fecha={new Date(detalle.fecha)}
           onCerrar={() => setDetalle(null)}
         />
       )}
 
+      </>}
       <Toast mensaje={aviso} icono={<IconSuccess width="17" height="17" />} />
     </section>
   )

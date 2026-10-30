@@ -1,4 +1,4 @@
-function ProductoCard({ producto, onAdd }) {
+function ProductoCard({ producto, onAdd, bloqueado }) {
   const agotado = producto.stock <= 0
   const bajo = !agotado && producto.stock <= producto.stockMinimo
 
@@ -28,7 +28,7 @@ function ProductoCard({ producto, onAdd }) {
         type="button"
         className="producto__add"
         onClick={() => onAdd(producto)}
-        disabled={agotado}
+        disabled={agotado || bloqueado}
         aria-label={agotado ? `${producto.nombre} agotado` : `Agregar ${producto.nombre}`}
       >
         {agotado ? 'No disponible' : '+'}

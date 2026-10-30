@@ -1,6 +1,6 @@
 import { IconArrow, IconCash, IconCard, IconEmptyCart, IconMinus, IconPlus, IconSuccess, IconTrash } from '../ui/icons'
 import { moneda } from '../ui/format'
-import { subtotalDe } from '../../data/precios'
+import { subtotalDe } from '../../utils/precios'
 
 function PosResumen({
   carrito,
@@ -15,18 +15,20 @@ function PosResumen({
   onCobrar,
   efectivoInsuficiente,
   faltante,
+  cobrando,
+  pendiente,
 }) {
   const recibidoConError = efectivoInsuficiente && recibido.trim() !== ''
 
   return (
-    <aside className="pos__resumen">
+    <aside className="pos__resumen" aria-busy={cobrando}>
       <header className="pos__resumen-header">
         <h2>Venta actual</h2>
         <button
           type="button"
           className="pos__icon-btn"
           onClick={onVaciar}
-          disabled={carrito.length === 0}
+          disabled={carrito.length === 0 || cobrando || pendiente}
           aria-label="Vaciar venta"
         >
           <IconTrash width="18" height="18" />
@@ -54,6 +56,7 @@ function PosResumen({
                 <div className="item__cantidad">
                   <button
                     type="button"
+                    disabled={cobrando || pendiente}
                     onClick={() => onCantidad(item.id, -1)}
                     aria-label={`Quitar una unidad de ${item.nombre}`}
                   >
@@ -62,6 +65,7 @@ function PosResumen({
                   <span>{item.cantidad}</span>
                   <button
                     type="button"
+                    disabled={cobrando || pendiente}
                     onClick={() => onCantidad(item.id, 1)}
                     aria-label={`Agregar una unidad de ${item.nombre}`}
                   >
@@ -91,6 +95,7 @@ function PosResumen({
             role="tab"
             aria-selected={metodoPago === 'efectivo'}
             className={`pos__pago${metodoPago === 'efectivo' ? ' pos__pago--activo' : ''}`}
+            disabled={cobrando || pendiente}
             onClick={() => onMetodo('efectivo')}
           >
             <IconCash width="17" height="17" />
@@ -101,6 +106,7 @@ function PosResumen({
             role="tab"
             aria-selected={metodoPago === 'tarjeta'}
             className={`pos__pago${metodoPago === 'tarjeta' ? ' pos__pago--activo' : ''}`}
+            disabled={cobrando || pendiente}
             onClick={() => onMetodo('tarjeta')}
           >
             <IconCard width="17" height="17" />
@@ -115,6 +121,8 @@ function PosResumen({
               <div className={`pos__recibido-campo${recibidoConError ? ' pos__recibido-campo--error' : ''}`}>
                 <span>$</span>
                 <input
+                  aria-label="Dinero recibido"
+                  disabled={cobrando || pendiente}
                   type="number"
                   min="0"
                   step="100"
@@ -145,9 +153,9 @@ function PosResumen({
           type="button"
           className="pos__cobrar"
           onClick={onCobrar}
-          disabled={carrito.length === 0 || (efectivoInsuficiente && metodoPago === 'efectivo')}
+          disabled={cobrando || (!pendiente && (carrito.length === 0 || (efectivoInsuficiente && metodoPago === 'efectivo')))}
         >
-          Cobrar {moneda(total)}
+          {cobrando ? 'Confirmando…' : pendiente ? 'Confirmar cobro pendiente' : `Cobrar ${moneda(total)}`}
           <IconArrow width="18" height="18" />
         </button>
       </div>

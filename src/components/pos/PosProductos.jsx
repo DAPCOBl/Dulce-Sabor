@@ -4,9 +4,8 @@ import Buscador from '../ui/Buscador'
 import Vacio from '../ui/Vacio'
 import { IconEmptyCart, IconWarning } from '../ui/icons'
 
-const CATEGORIAS = ['Todos', 'Pan dulce', 'Pasteles', 'Saldados', 'Bebidas']
 
-function PosProductos({ filtrados, onAdd, busqueda, onBusqueda, categoria, onCategoria }) {
+function PosProductos({ bloqueado, categorias, filtrados, onAdd, busqueda, onBusqueda, categoria, onCategoria }) {
   return (
     <section className="pos__centro">
       <Cabecera
@@ -23,7 +22,7 @@ function PosProductos({ filtrados, onAdd, busqueda, onBusqueda, categoria, onCat
       />
 
       <div className="pos__categorias" role="tablist" aria-label="Categorías">
-        {CATEGORIAS.map((cat) => (
+        {['Todos', ...categorias].map((cat) => (
           <button
             key={cat}
             type="button"
@@ -46,7 +45,7 @@ function PosProductos({ filtrados, onAdd, busqueda, onBusqueda, categoria, onCat
         {filtrados.length > 0 ? (
           <div className="pos__grid">
             {filtrados.map((producto) => (
-              <ProductoCard key={producto.id} producto={producto} onAdd={onAdd} />
+              <ProductoCard key={producto.id} producto={producto} onAdd={onAdd} bloqueado={bloqueado} />
             ))}
           </div>
         ) : (

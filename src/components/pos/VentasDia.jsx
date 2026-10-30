@@ -6,7 +6,7 @@ import Vacio from '../ui/Vacio'
 import { IconCash, IconCard, IconEye, IconPlus, IconSales, IconSuccess } from '../ui/icons'
 import { moneda, pluralVentas } from '../ui/format'
 import { metodoDePago } from '../ui/metodos'
-import { DATOS_SEDE } from '../../data/ventas'
+import { DATOS_SEDE } from '../../config/negocio'
 import './ventas.css'
 
 function VentasDia({ ventas, onNuevaVenta, onVer }) {
