@@ -1,179 +1,58 @@
-import { useMemo, useState } from 'react'
-import Cabecera from '../../components/ui/Cabecera'
-import Kpi from '../../components/ui/Kpi'
-import { moneda, diaCorto, isoFecha } from '../../components/ui/format'
-import { IconExport, IconSales, IconTendenciaUp } from '../../components/ui/icons'
-import { METODOS_PAGO } from '../../components/ui/metodos'
-import { BALANCE_MES } from '../../data/admin'
-import { subtotalDe } from '../../data/precios'
-import {
-  CAJEROS_SEDE,
-  VENTAS_SEDE,
-  fechaDeVenta,
-} from '../../data/ventasSede'
-import { useEstado } from '../../services/estado'
+import { useRef, useState } from 'react'
+import Cabecera from '../ui/Cabecera'
+import Kpi from '../ui/Kpi'
+import { moneda } from '../ui/format'
+import { IconExport, IconSales, IconTendenciaUp } from '../ui/icons'
+import { METODOS_PAGO } from '../ui/metodos'
+import { useRemote } from '../../hooks/useRemote'
+import { hoyColombia, desplazarDia } from '../../utils/fechas'
+import { reporteVentas, exportarReporte as solicitarExportacion, descargarArchivo } from '../../services/reportes'
+import { opcionesVentas } from '../../services/ventas'
+import RemoteStatus from '../ui/RemoteStatus'
 import GraficoVentas from './GraficoVentas'
 import BalanceMes from './BalanceMes'
-import '../../components/admin/admin.css'
-import '../../components/admin/adminVentas.css'
+import './admin.css'
+import './adminVentas.css'
 
 function AdminReportes() {
-  const { sesion } = useEstado()
-  const [hoy] = useState(() => new Date())
-
-  const [desde, setDesde] = useState(() => {
-    const fecha = new Date()
-    fecha.setDate(fecha.getDate() - 6)
-    return isoFecha(fecha)
-  })
-  const [hasta, setHasta] = useState(() => isoFecha(new Date()))
+  const [desde, setDesde] = useState(() => desplazarDia(hoyColombia(), -6))
+  const [hasta, setHasta] = useState(hoyColombia)
   const [cajero, setCajero] = useState('todos')
   const [metodo, setMetodo] = useState('todos')
-
-  const rangoValido = desde <= hasta
-  const fechaInicio = rangoValido ? desde : hasta
-  const fechaFin = rangoValido ? hasta : desde
-
-  const ventasRango = useMemo(() => {
-    const inicio = new Date(`${fechaInicio}T00:00:00`)
-    const fin = new Date(`${fechaFin}T23:59:59`)
-    return VENTAS_SEDE.filter((venta) => {
-      const fechaVenta = fechaDeVenta(venta, hoy)
-      if (fechaVenta < inicio || fechaVenta > fin) return false
-      if (cajero !== 'todos' && venta.cajero !== cajero) return false
-      if (metodo !== 'todos' && venta.metodo !== metodo) return false
-      return true
-    })
-  }, [fechaInicio, fechaFin, cajero, metodo, hoy])
-
-  const ingresosRango = useMemo(
-    () => ventasRango.reduce((acumulado, venta) => acumulado + venta.importe, 0),
-    [ventasRango],
-  )
-
-  const incluyeHoy = useMemo(() => {
-    const hoyIso = isoFecha(hoy)
-    return fechaInicio <= hoyIso && fechaFin >= hoyIso
-  }, [fechaInicio, fechaFin, hoy])
-
-  const ingresosTotales = ingresosRango + (incluyeHoy ? sesion.ingresos : 0)
-  const ventasTotales = ventasRango.length + (incluyeHoy ? sesion.ventas : 0)
-
-  const costoRatio = BALANCE_MES.costoProductosVendidos / BALANCE_MES.ingresos
-  const gastosRatio = BALANCE_MES.gastosOperativos / BALANCE_MES.ingresos
-  const balance = {
-    ingresos: ingresosTotales,
-    costoProductosVendidos: Math.round(ingresosTotales * costoRatio),
-    gastosOperativos: Math.round(ingresosTotales * gastosRatio),
-  }
-  const utilidad = balance.ingresos - balance.costoProductosVendidos - balance.gastosOperativos
-  const margen = balance.ingresos > 0 ? (utilidad / balance.ingresos) * 100 : 0
-
-  const diasRango = useMemo(() => {
-    const inicio = new Date(`${fechaInicio}T00:00:00`)
-    const fin = new Date(`${fechaFin}T00:00:00`)
-    const lista = []
-    const cursor = new Date(inicio)
-    while (cursor <= fin) {
-      lista.push(new Date(cursor))
-      cursor.setDate(cursor.getDate() + 1)
-    }
-    return lista
-  }, [fechaInicio, fechaFin])
-
-  const serie = useMemo(
-    () =>
-      diasRango.map((dia) => {
-        const iso = isoFecha(dia)
-        const total = ventasRango
-          .filter((venta) => isoFecha(fechaDeVenta(venta, hoy)) === iso)
-          .reduce((acumulado, venta) => acumulado + venta.importe, 0)
-        const esHoy = iso === isoFecha(hoy)
-        const valor = total + (esHoy && incluyeHoy ? sesion.ingresos : 0)
-        return { valor, etiqueta: diaCorto(dia) }
-      }),
-    [diasRango, ventasRango, hoy, incluyeHoy, sesion.ingresos],
-  )
-
-  const totalRango = useMemo(
-    () => serie.reduce((acumulado, punto) => acumulado + punto.valor, 0),
-    [serie],
-  )
-
-  const porMetodo = useMemo(
-    () =>
-      Object.entries(METODOS_PAGO)
-        .map(([valor, info]) => {
-          const ventas = ventasRango.filter((venta) => venta.metodo === valor)
-          return {
-            valor,
-            etiqueta: info.etiqueta,
-            ventas: ventas.length,
-            ingresos: ventas.reduce((acumulado, venta) => acumulado + venta.importe, 0),
-          }
-        })
-        .filter((item) => item.ventas > 0),
-    [ventasRango],
-  )
-
-  const porCajero = useMemo(
-    () =>
-      CAJEROS_SEDE.map((nombre) => {
-        const ventas = ventasRango.filter((venta) => venta.cajero === nombre)
-        const ingresos = ventas.reduce((acumulado, venta) => acumulado + venta.importe, 0)
-        return {
-          nombre,
-          ventas: ventas.length,
-          ingresos,
-        }
-      }).filter((item) => item.ventas > 0),
-    [ventasRango],
-  )
-
-  const topProductos = useMemo(() => {
-    const acumulado = {}
-    ventasRango.forEach((venta) => {
-      venta.items.forEach((item) => {
-        if (!acumulado[item.id]) {
-          acumulado[item.id] = {
-            id: item.id,
-            nombre: item.nombre,
-            cantidad: 0,
-            ingresos: 0,
-          }
-        }
-        acumulado[item.id].cantidad += item.cantidad
-        acumulado[item.id].ingresos += subtotalDe(item)
-      })
-    })
-    return Object.values(acumulado)
-      .sort((a, b) => b.ingresos - a.ingresos)
-      .slice(0, 8)
-  }, [ventasRango])
-
+  const [exportando, setExportando] = useState(false)
+  const [error, setError] = useState('')
+  const exportRef = useRef(false)
+  const filtros = { desde, hasta, cajeroId: cajero, metodo }
+  const remote = useRemote(options => reporteVentas(filtros, options), [filtros])
+  const opciones = useRemote(opcionesVentas)
+  const fechaInicio = desde
+  const fechaFin = hasta
+  const balance = remote.data?.balance
+  const ingresosTotales = remote.data?.resumen.ingresos
+  const ventasTotales = remote.data?.resumen.ventas
+  const utilidad = balance?.utilidad ?? balance?.utilidadBruta
+  const margen = balance?.margen ?? balance?.margenBruto
+  const serie = remote.data?.serie ?? []
+  const totalRango = ingresosTotales
+  const porMetodo = remote.data?.porMetodo ?? []
+  const porCajero = remote.data?.porCajero ?? []
+  const topProductos = remote.data?.topProductos ?? []
+  const nombreCajero = opciones.data?.cajeros.find(u => u.id === cajero)?.nombre ?? cajero
   const formatearFecha = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
 
-  const exportarReporte = () => {
-    const tituloAnterior = document.title
-    document.title = `Reporte ${fechaInicio} a ${fechaFin}`
-    const restaurar = () => {
-      document.title = tituloAnterior
-      window.removeEventListener('afterprint', restaurar)
-    }
-    window.addEventListener('afterprint', restaurar)
-    window.print()
-  }
-  const rangoTitulo = `${formatearFecha(fechaInicio)} – ${formatearFecha(fechaFin)}`
+  const rangoTitulo = desde && hasta ? `${formatearFecha(desde)} – ${formatearFecha(hasta)}` : 'Selecciona un rango'
   const rangoTexto = rangoTitulo
-
-  function aplicarPreset(dias) {
-    const fecha = new Date()
-    const inicio = new Date()
-    inicio.setDate(fecha.getDate() - (dias - 1))
-    setDesde(isoFecha(inicio))
-    setHasta(isoFecha(fecha))
+  async function exportarReporte() {
+    if (exportRef.current || !remote.data || remote.loading || remote.error) return
+    exportRef.current = true; setExportando(true); setError('')
+    try { descargarArchivo(await solicitarExportacion(filtros)) } catch (error) { setError(error.message) }
+    finally { exportRef.current = false; setExportando(false) }
   }
-
+  function aplicarPreset(dias) {
+    const hoy = hoyColombia()
+    setDesde(desplazarDia(hoy, -(dias - 1)))
+    setHasta(hoy)
+  }
   return (
     <section className="admin__reportes">
       <Cabecera
@@ -181,9 +60,9 @@ function AdminReportes() {
         titulo="Reporte completo del negocio."
         subtitulo="Filtra por rango de fechas y revisa ingresos, ventas, balance y detalle por método, cajero y producto."
         acciones={
-          <button type="button" className="ui__boton ui__boton--primario" onClick={exportarReporte}>
+          <button type="button" className="ui__boton ui__boton--primario" onClick={exportarReporte} disabled={exportando || remote.loading || !remote.data || Boolean(remote.error)}>
             <IconExport width="17" height="17" />
-            Exportar reporte
+            {exportando ? 'Exportando…' : 'Exportar reporte'}
           </button>
         }
       />
@@ -220,8 +99,8 @@ function AdminReportes() {
             aria-label="Cajero"
           >
           <option value="todos">Todos los cajeros</option>
-          {CAJEROS_SEDE.map((nombre) => (
-            <option key={nombre} value={nombre}>{nombre}</option>
+          {opciones.data?.cajeros.map(usuario => (
+            <option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
           ))}
         </select>
         </div>
@@ -247,6 +126,10 @@ function AdminReportes() {
         </div>
       </section>
 
+      <RemoteStatus {...opciones} />
+      <RemoteStatus {...remote} />
+      {error && <p className="ui__request-error" role="alert">{error}</p>}
+      {remote.data && <>
       <h3 className="admin__reportes-titulo">Reporte del {rangoTitulo}</h3>
 
       <section className="ui__kpis" aria-label="Indicadores del reporte">
@@ -265,7 +148,7 @@ function AdminReportes() {
         />
         <Kpi
           destacado
-          etiqueta="Utilidad estimada"
+          etiqueta={balance.gastosAsignados ? "Utilidad neta" : "Utilidad bruta"}
           valor={moneda(utilidad)}
           unidad="COP"
           icono={<IconTendenciaUp width="17" height="17" />}
@@ -282,7 +165,7 @@ function AdminReportes() {
       <div className="admin__reportes-grid">
         <BalanceMes
           balance={balance}
-          titulo={`Balance · ${formatearFecha(fechaInicio)} – ${formatearFecha(fechaFin)}${cajero !== 'todos' ? ` · ${cajero}` : ''}${metodo !== 'todos' ? ` · ${METODOS_PAGO[metodo].etiqueta}` : ''}`}
+          titulo={`Balance · ${formatearFecha(fechaInicio)} – ${formatearFecha(fechaFin)}${cajero !== 'todos' ? ` · ${nombreCajero}` : ''}${metodo !== 'todos' ? ` · ${METODOS_PAGO[metodo].etiqueta}` : ''}`}
         />
 
       <section className="admin__tarjeta" aria-label="Detalle por método de pago">
@@ -391,6 +274,7 @@ function AdminReportes() {
           </table>
         </div>
       </section>
+      </>}
     </section>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import PosSidebar from '../../components/pos/PosSidebar'
 import AdminProductos from './AdminProductos'
 import AdminUsuarios from '../../components/admin/AdminUsuarios'
@@ -11,201 +11,51 @@ import InventarioPanel from '../../components/admin/InventarioPanel'
 import UltimasVentas from '../../components/admin/UltimasVentas'
 import Cabecera from '../../components/ui/Cabecera'
 import Kpi from '../../components/ui/Kpi'
-import '../../components/pos/pos.css'
-import {
-  IconArrow,
-  IconSales,
-  IconTendenciaUp,
-} from '../../components/ui/icons'
+import RemoteStatus from '../../components/ui/RemoteStatus'
 import { SECCIONES } from '../../components/admin/secciones'
-import {
-  diaCorto,
-  isoFecha,
-  moneda,
-  primerNombre,
-  porcentaje,
-  periodoMesAnteriorCorto,
-  saludo,
-} from '../../components/ui/format'
-import {
-  BALANCE_MES,
-  RESUMEN_DIA,
-  RESUMEN_MES,
-  SERIE_SEMANAL,
-} from '../../data/admin'
-import { alertasDeInventario, useEstado } from '../../services/estado'
+import { moneda, primerNombre, porcentaje, saludo } from '../../components/ui/format'
+import { useRemote } from '../../hooks/useRemote'
+import { resumenAdmin } from '../../services/reportes'
+import '../../components/pos/pos.css'
 import '../../components/admin/admin.css'
 
+function ResumenNegocio({ session, onNavigate }) {
+  const [reloj] = useState(() => new Date())
+  const remote = useRemote(resumenAdmin)
+  if (!remote.data) return <RemoteStatus {...remote} />
+  const { resumenDia, resumenMes, inventario, balanceMes, serieSemanal, ultimasVentas, alertas } = remote.data
+  return <>
+    <Cabecera miga="Resumen del negocio" titulo={`${saludo(reloj)}, ${primerNombre(session.user.nombre)}.`} subtitulo="Resumen operativo y métricas de tu sede." />
+    <RemoteStatus {...remote} />
+    <section className="ui__kpis ui__kpis--tres admin__kpis-resumen" aria-label="Indicadores del día">
+      <Kpi oscuro etiqueta="Ingresos de hoy" valor={moneda(resumenDia.ingresos)} unidad="COP" meta={<span>{resumenDia.ventas} ventas</span>} />
+      <Kpi etiqueta="Ingresos del mes" valor={moneda(resumenMes.ingresos)} unidad="COP"
+        meta={<span>{resumenMes.comparacion == null ? 'Sin base de comparación' : `${porcentaje(resumenMes.comparacion)} frente al mismo tramo del mes anterior`}</span>} />
+      <Kpi etiqueta="Productos en alerta" valor={inventario.enAlerta} unidad="PRODUCTOS" meta={<span>{inventario.agotados} agotados · {inventario.bajos} con stock bajo</span>} />
+    </section>
+    <section className="admin__fila">
+      <GraficoVentas serie={serieSemanal} total={serieSemanal.reduce((s,dia) => s + dia.valor, 0)} />
+      <BalanceMes balance={balanceMes} onVerReporte={() => onNavigate('reportes')} />
+    </section>
+    <section className="admin__fila">
+      <UltimasVentas ventas={ultimasVentas} onVerVentas={() => onNavigate('ventas')} />
+      <AlertasInventario alertas={alertas} onVerInventario={() => onNavigate('inventario')} />
+    </section>
+  </>
+}
 function AdminHome({ session, onLogout }) {
   const [vista, setVista] = useState('resumen')
-  const [fecha] = useState(() => new Date())
-  const [reloj, setReloj] = useState(() => new Date())
-  const { ventas, productos, sesion } = useEstado()
-
-  useEffect(() => {
-    const timer = setInterval(() => setReloj(new Date()), 30000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const esHoy = isoFecha(fecha) === isoFecha(reloj)
-
-  // Ingresos del día: la base de la sede más los cobros de la sesión en curso.
-  const ingresosHoy = RESUMEN_DIA.ingresos + sesion.ingresos
-  const ventasHoy = RESUMEN_DIA.ventas + sesion.ventas
-  const ingresosMes = RESUMEN_MES.ingresos + sesion.ingresos
-
-  const serie = useMemo(() => {
-    const valores = [...SERIE_SEMANAL, ingresosHoy]
-    return valores.map((valor, indice) => {
-      const dia = new Date(fecha)
-      dia.setDate(fecha.getDate() - (valores.length - 1 - indice))
-      const ultimo = indice === valores.length - 1
-      return { valor, etiqueta: ultimo && esHoy ? 'Hoy' : diaCorto(dia) }
-    })
-  }, [fecha, esHoy, ingresosHoy])
-
-  const totalSemana = useMemo(
-    () => serie.reduce((acumulado, punto) => acumulado + punto.valor, 0),
-    [serie],
-  )
-
-  const balance = useMemo(
-    () => ({ ...BALANCE_MES, ingresos: BALANCE_MES.ingresos + sesion.ingresos }),
-    [sesion.ingresos],
-  )
-
-  const alertas = useMemo(() => alertasDeInventario(productos), [productos])
-  const agotados = alertas.filter((alerta) => alerta.estado === 'agotado').length
-  const stockBajo = alertas.length - agotados
-
-  const seccion = SECCIONES.find((item) => item.id === vista) ?? SECCIONES[0]
-  const IconoSeccion = seccion.Icono
-
-  return (
-    <div className="admin">
-      <PosSidebar
-        vista={vista}
-        onNavigate={setVista}
-        session={session}
-        onLogout={onLogout}
-        secciones={SECCIONES}
-        menuTitulo="Administración"
-        rolEtiqueta="Administrador"
-        admin
-        link="/guia/administrador"
-      />
-
-      <div className="admin__cuerpo">
-        <main className="admin__principal pos__centro">
-          {vista === 'inventario' ? (
-            <InventarioPanel session={session} />
-          ) : vista === 'productos' ? (
-            <AdminProductos />
-          ) : vista === 'usuarios' ? (
-            <AdminUsuarios session={session} />
-          ) : vista === 'ventas' ? (
-            <AdminVentas />
-          ) : vista === 'reportes' ? (
-            <AdminReportes />
-          ) : vista === 'resumen' ? (
-            <>
-              <Cabecera
-                miga="Resumen del negocio"
-                titulo={`${saludo(reloj)}, ${primerNombre(session.user.nombre)}.`}
-                  subtitulo="Resumen operativo y métricas clave de tu sede."
-              />
-
-              <section className="ui__kpis ui__kpis--tres admin__kpis-resumen" aria-label="Indicadores del día">
-                <Kpi
-                  oscuro
-                  etiqueta="Ingresos de hoy"
-                  valor={moneda(ingresosHoy)}
-                  unidad="COP"
-                  icono={<IconSales width="17" height="17" />}
-                  meta={
-                    <span className="admin__kpi-linea">
-                      <strong>{ventasHoy}</strong> ventas
-                    </span>
-                  }
-                />
-
-                <Kpi
-                  etiqueta="Ingresos del mes"
-                  valor={moneda(ingresosMes)}
-                  unidad="COP"
-                  icono={<IconTendenciaUp width="17" height="17" />}
-                  meta={
-                    <>
-                      <span className="ui__tendencia ui__tendencia--sube">
-                        <IconTendenciaUp width="14" height="14" />
-                        {porcentaje(RESUMEN_MES.comparacion)}
-                      </span>
-                      <span>vs. {periodoMesAnteriorCorto(fecha)}</span>
-                    </>
-                  }
-                />
-
-                <Kpi
-                  etiqueta="Productos en alerta"
-                  valor={alertas.length}
-                  unidad="PRODUCTOS"
-                  meta={
-                    <span className="admin__kpi-linea">
-                      <span className="ui__tendencia ui__tendencia--alerta">
-                        {agotados} agotado
-                      </span>
-              <span className="ui__tendencia ui__tendencia--baja">
-                {stockBajo} con stock bajo
-              </span>
-                    </span>
-                  }
-                />
-              </section>
-
-              <section className="admin__fila">
-                <GraficoVentas serie={serie} total={totalSemana} />
-                <BalanceMes balance={balance} onVerReporte={() => setVista('reportes')} />
-              </section>
-
-              <section className="admin__fila">
-                <UltimasVentas ventas={ventas} onVerVentas={() => setVista('ventas')} />
-                <AlertasInventario
-                  alertas={alertas}
-                  onVerInventario={() => setVista('inventario')}
-                />
-              </section>
-
-              <section className="admin__banner">
-                <div className="admin__banner-texto">
-                  <h2>Un catálogo tan cuidado como tus recetas.</h2>
-                  <p>Crea, consulta, edita o da de baja productos desde tu catálogo.</p>
-                </div>
-                <button
-                  type="button"
-                  className="admin__banner-enlace"
-                  onClick={() => setVista('productos')}
-                >
-                  Gestionar productos
-                  <IconArrow width="16" height="16" />
-                </button>
-              </section>
-            </>
-          ) : (
-            <section className="admin__placeholder">
-              <span className="admin__placeholder-icono">
-                <IconoSeccion width="24" height="24" />
-              </span>
-              <h2>{seccion.etiqueta}</h2>
-              <p>
-                Estamos horneando esta sección. Por ahora puedes revisar el
-                resumen del negocio desde el menú lateral.
-              </p>
-            </section>
-          )}
-        </main>
-      </div>
-    </div>
-  )
+  return <div className="admin">
+    <PosSidebar vista={vista} onNavigate={setVista} session={session} onLogout={onLogout} secciones={SECCIONES}
+      menuTitulo="Administración" rolEtiqueta="Administrador" admin link="/guia/administrador" />
+    <div className="admin__cuerpo"><main className="admin__principal pos__centro">
+      {vista === 'inventario' ? <InventarioPanel session={session} />
+        : vista === 'productos' ? <AdminProductos />
+        : vista === 'usuarios' ? <AdminUsuarios session={session} />
+        : vista === 'ventas' ? <AdminVentas />
+        : vista === 'reportes' ? <AdminReportes />
+        : <ResumenNegocio session={session} onNavigate={setVista} />}
+    </main></div>
+  </div>
 }
-
 export default AdminHome

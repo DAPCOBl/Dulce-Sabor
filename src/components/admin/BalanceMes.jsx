@@ -2,7 +2,8 @@ import { IconArrow } from '../ui/icons'
 import { moneda } from '../ui/format'
 
 function BalanceMes({ balance, onVerReporte, titulo = 'Balance del mes' }) {
-  const utilidad = balance.ingresos - balance.costoProductosVendidos - balance.gastosOperativos
+  const parcial = balance.gastosAsignados === false
+  const utilidad = parcial ? balance.utilidadBruta : balance.utilidad
 
   return (
     <section className="admin__tarjeta admin__balance">
@@ -25,15 +26,16 @@ function BalanceMes({ balance, onVerReporte, titulo = 'Balance del mes' }) {
         </li>
         <li className="admin__balance-fila admin__balance-fila--resta">
           <span className="admin__balance-concepto">− Gastos operativos</span>
-          <strong className="admin__balance-valor">{moneda(balance.gastosOperativos)}</strong>
+          <strong className="admin__balance-valor">{balance.gastosOperativos == null ? 'Sin asignar' : moneda(balance.gastosOperativos)}</strong>
         </li>
       </ul>
 
       <div className="admin__balance-utilidad">
-        <span className="admin__balance-utilidad-etiqueta">Utilidad estimada</span>
+        <span className="admin__balance-utilidad-etiqueta">{parcial ? 'Utilidad bruta' : 'Utilidad neta'}</span>
         <strong className="admin__balance-utilidad-valor">{moneda(utilidad)}</strong>
       </div>
 
+      {parcial && <p className="form__help">Los gastos generales de la sede no se asignan a este filtro.</p>}
       {onVerReporte && (
         <button type="button" className="ui__enlace admin__balance-enlace" onClick={onVerReporte}>
           Ver reporte financiero
