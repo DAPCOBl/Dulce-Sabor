@@ -50,7 +50,7 @@ function GraficoVentas({ serie, total, rango = 'Rango seleccionado' }) {
               : 2
             return (
               <div
-                key={punto.etiqueta}
+                key={punto.fecha}
                 className={`admin__barra${esActual ? ' admin__barra--actual' : ''}`}
                 title={`${punto.etiqueta}: ${moneda(punto.valor)} COP`}
               >

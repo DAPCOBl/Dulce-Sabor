@@ -28,6 +28,7 @@ function UltimasVentas({ ventas, onVerVentas }) {
             </tr>
           </thead>
           <tbody>
+            {ventas.length === 0 && <tr><td colSpan={5}>Hoy no hay ventas registradas.</td></tr>}
             {ventas.map((venta) => {
               const metodo = METODOS_PAGO[venta.metodo]
               const IconoMetodo = metodo.Icono

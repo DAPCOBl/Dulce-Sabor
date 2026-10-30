@@ -12,7 +12,9 @@ export function publicUser(user) {
 
 function loadSession() {
   // Las sesiones del prototipo no contienen token y dejan de ser válidas.
-  try { globalThis.localStorage?.removeItem(SESSION_KEY) } catch { /* Puede estar bloqueado. */ }
+  try {
+    for (const key of [SESSION_KEY, 'dulcesabor:estado:v2', 'dulcesabor:usuarios:v1']) globalThis.localStorage?.removeItem(key)
+  } catch { /* Puede estar bloqueado. */ }
   try {
     const raw = globalThis.sessionStorage?.getItem(SESSION_KEY)
     if (!raw) return null

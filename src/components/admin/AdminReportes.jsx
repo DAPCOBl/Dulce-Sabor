@@ -224,7 +224,7 @@ function AdminReportes() {
             </thead>
             <tbody>
               {porCajero.map((item) => (
-                <tr key={item.nombre}>
+                <tr key={item.id}>
                   <td>{item.nombre}</td>
                   <td>{item.ventas}</td>
                   <td className="admin__total">{moneda(item.ingresos)}</td>

@@ -8,3 +8,9 @@ export function desplazarDia(fecha, dias) {
   resultado.setUTCDate(resultado.getUTCDate() + dias)
   return resultado.toISOString().slice(0, 10)
 }
+
+export function fechaComprobante(fecha, corto = false) {
+  return new Intl.DateTimeFormat('es-CO', { timeZone: 'America/Bogota',
+    ...(corto ? { day: 'numeric', month: 'short', year: 'numeric' } : { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+  }).format(new Date(fecha))
+}

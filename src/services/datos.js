@@ -2,7 +2,21 @@ import { apiRequest } from './api.js'
 let revision = 0
 const listeners = new Set()
 export const getRevision = () => revision
-export function subscribeData(listener) { listeners.add(listener); return () => listeners.delete(listener) }
+let stopRefresh
+export function subscribeData(listener) {
+  listeners.add(listener)
+  if (!stopRefresh && typeof window !== 'undefined') {
+    const refresh = () => { if (document.visibilityState === 'visible') invalidarDatos() }
+    const timer = window.setInterval(refresh, 60000)
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    stopRefresh = () => {
+      window.clearInterval(timer); window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', refresh); stopRefresh = undefined
+    }
+  }
+  return () => { listeners.delete(listener); if (!listeners.size) stopRefresh?.() }
+}
 export function invalidarDatos() { revision++; listeners.forEach(listener => listener()) }
 export function consulta(params = {}) {
   const query = new URLSearchParams()

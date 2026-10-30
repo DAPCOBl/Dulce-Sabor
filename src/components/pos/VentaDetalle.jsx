@@ -1,6 +1,7 @@
 import Modal, { ModalDatos, ModalFila, ModalItems, ModalTotal } from '../ui/Modal'
 import { IconImprimir, IconSales } from '../ui/icons'
-import { formatFecha, fechaDiaMes, moneda } from '../ui/format'
+import { moneda } from '../ui/format'
+import { fechaComprobante } from '../../utils/fechas'
 import { metodoDePago } from '../ui/metodos'
 import { DATOS_SEDE } from '../../config/negocio'
 import { subtotalDe } from '../../utils/precios'
@@ -20,7 +21,7 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
       <Modal
         onCerrar={onCerrar}
         titulo={`Venta ${venta.folio}`}
-        subtitulo={`Comprobante de venta · ${fechaDiaMes(fechaVenta)}`}
+        subtitulo={`Comprobante de venta · ${fechaComprobante(fechaVenta, true)}`}
         icono={<IconSales width="24" height="24" />}
         ancho
         acciones={
@@ -81,7 +82,7 @@ function VentaDetalle({ venta, onCerrar, cajero, onImprimir, fecha, variante = '
       }
     >
       <ModalDatos>
-        <ModalFila etiqueta="Fecha">{formatFecha(fechaVenta)}</ModalFila>
+        <ModalFila etiqueta="Fecha">{fechaComprobante(fechaVenta)}</ModalFila>
         <ModalFila etiqueta="Hora">{venta.hora}</ModalFila>
         <ModalFila etiqueta="Método de pago">
           <span className={`ventas__metodo ventas__metodo--${venta.metodo}`}>

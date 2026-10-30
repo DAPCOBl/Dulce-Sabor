@@ -136,3 +136,15 @@ test('restaura candidatos de sessionStorage para validarlos y publica cambios de
   saveSession(session()); clearSession(); unsubscribe()
   assert.equal(cambios, 2)
 })
+
+test('retira los datos comerciales del prototipo y conserva correo y cobros pendientes', async () => {
+  localStorage.setItem('dulcesabor:estado:v2', '{"ventas":[]}')
+  localStorage.setItem('dulcesabor:usuarios:v1', '[{"password":"demo"}]')
+  localStorage.setItem('dulcesabor:email', 'recordado@example.com')
+  sessionStorage.setItem('dulcesabor:cobro:admin', '{"key":"pendiente"}')
+  await import('../src/services/session.js?limpieza')
+  assert.equal(localStorage.getItem('dulcesabor:estado:v2'), null)
+  assert.equal(localStorage.getItem('dulcesabor:usuarios:v1'), null)
+  assert.equal(localStorage.getItem('dulcesabor:email'), 'recordado@example.com')
+  assert.equal(sessionStorage.getItem('dulcesabor:cobro:admin'), '{"key":"pendiente"}')
+})

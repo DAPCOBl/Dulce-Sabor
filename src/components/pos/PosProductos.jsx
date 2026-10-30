@@ -38,7 +38,7 @@ function PosProductos({ bloqueado, categorias, filtrados, onAdd, busqueda, onBus
 
       <div className="pos__productos">
         <div className="pos__productos-titulo">
-          <h2>Favoritos de la casa</h2>
+          <h2>Productos disponibles</h2>
           <span className="pos__contador">{filtrados.length} productos</span>
         </div>
 
