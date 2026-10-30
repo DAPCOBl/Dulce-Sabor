@@ -13,5 +13,6 @@ export const SECCIONES = [
   { id: 'inventario', etiqueta: 'Inventario', Icono: IconInventario },
   { id: 'ventas', etiqueta: 'Ventas', Icono: IconSales },
   { id: 'reportes', etiqueta: 'Reportes', Icono: IconReportes },
+  { id: 'gastos', etiqueta: 'Gastos', Icono: IconReportes },
   { id: 'usuarios', etiqueta: 'Usuarios', Icono: IconUsuarios },
 ]

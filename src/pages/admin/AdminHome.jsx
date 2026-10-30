@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import PosSidebar from '../../components/pos/PosSidebar'
 import AdminProductos from './AdminProductos'
+import AdminGastos from '../../components/admin/AdminGastos'
 import AdminUsuarios from '../../components/admin/AdminUsuarios'
 import AdminReportes from '../../components/admin/AdminReportes'
 import AdminVentas from '../../components/admin/AdminVentas'
@@ -51,6 +52,7 @@ function AdminHome({ session, onLogout }) {
     <div className="admin__cuerpo"><main className="admin__principal pos__centro">
       {vista === 'inventario' ? <InventarioPanel session={session} />
         : vista === 'productos' ? <AdminProductos />
+        : vista === 'gastos' ? <AdminGastos />
         : vista === 'usuarios' ? <AdminUsuarios session={session} />
         : vista === 'ventas' ? <AdminVentas />
         : vista === 'reportes' ? <AdminReportes />
