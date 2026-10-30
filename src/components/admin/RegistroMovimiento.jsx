@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Modal from '../ui/Modal'
 import { IconArrow, IconInfo, IconSuccess } from '../ui/icons'
+import { movimientoPendiente } from '../../services/inventario'
 
 const CANTIDAD_INICIAL = 12
 
@@ -8,17 +9,20 @@ function RegistroMovimiento({
   productos,
   session,
   productoId,
+  cargandoProducto,
   opciones,
   onProductoChange,
   onRegistrar,
   onCerrar,
 }) {
-  const [tipo, setTipo] = useState('entrada')
-  const [cantidad, setCantidad] = useState(CANTIDAD_INICIAL)
-  const [motivo, setMotivo] = useState(opciones.motivosEntrada[0])
+  const [pendiente, setPendiente] = useState(movimientoPendiente)
+  const [tipo, setTipo] = useState(() => movimientoPendiente()?.body.tipo ?? 'entrada')
+  const [cantidad, setCantidad] = useState(() => movimientoPendiente()?.body.cantidad ?? CANTIDAD_INICIAL)
+  const [motivo, setMotivo] = useState(() => movimientoPendiente()?.body.motivo ?? opciones.motivosEntrada[0])
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
   const pendingRef = useRef(false)
+  const confirmadaRef = useRef(false)
   const [exito, setExito] = useState(null)
 
   const campoProductoRef = useRef(null)
@@ -27,51 +31,82 @@ function RegistroMovimiento({
     campoProductoRef.current?.focus()
   }, [])
 
-  const producto = productos.find((item) => item.id === productoId) ?? productos[0]
+  const productoActivoId = pendiente?.body.productoId ?? productoId
+  const producto = productos.find((item) => item.id === productoActivoId) ?? (pendiente ? null : productos[0])
   const stockActual = producto?.stock ?? 0
   const unidades = Math.max(Math.round(Number(cantidad) || 0), 0)
   const nuevoStock = tipo === 'entrada' ? stockActual + unidades : unidades
   const motivos = tipo === 'entrada' ? opciones.motivosEntrada : opciones.motivosAjuste
 
   function cambiarTipo(siguiente) {
-    if (guardando) return
+    if (guardando || pendiente) return
+    confirmadaRef.current = false
     setTipo(siguiente)
     setMotivo(siguiente === 'entrada' ? opciones.motivosEntrada[0] : opciones.motivosAjuste[0])
     setCantidad(siguiente === 'entrada' ? CANTIDAD_INICIAL : stockActual)
     setExito(null)
   }
 
-  function elegirProducto(id) {
-    if (guardando) return
-    if (tipo === 'ajuste') setCantidad(productos.find(item => item.id === id)?.stock ?? 0)
-    onProductoChange(id)
+  async function elegirProducto(id) {
+    if (guardando || pendiente) return
+    confirmadaRef.current = false
+    const seleccionado = await onProductoChange(id)
+    if (tipo === 'ajuste' && seleccionado) setCantidad(seleccionado.stock)
     setExito(null)
   }
 
   async function guardar(evento) {
     evento.preventDefault()
-    if (pendingRef.current) return
+    if (pendingRef.current || confirmadaRef.current) return
     setError('')
+    setExito(null)
     const numero = Number(cantidad)
-    if (String(cantidad).trim() === '' || !Number.isInteger(numero) || numero < (tipo === 'entrada' ? 1 : 0)) { setError('Escribe una cantidad entera válida.'); return }
-    pendingRef.current = true; setGuardando(true)
+    if (!pendiente && (String(cantidad).trim() === '' || !Number.isSafeInteger(numero) || numero < (tipo === 'entrada' ? 1 : 0) || numero > 2147483647)) {
+      setError('Escribe una cantidad entera válida.')
+      return
+    }
+    const body = pendiente?.body ?? { productoId, cantidad: numero, tipo, motivo }
+    pendingRef.current = true
+    setGuardando(true)
     try {
-    const movimiento = await onRegistrar({
-      productoId,
-      cantidad: numero,
-      tipo,
-      motivo,
-    })
+      const movimiento = await onRegistrar(body)
+      setPendiente(movimientoPendiente())
+      if (!movimiento) return
+      confirmadaRef.current = true
+      setExito(movimiento)
+      setCantidad(body.tipo === 'entrada' ? CANTIDAD_INICIAL : movimiento.saldo)
+    } catch (error) {
+      setPendiente(movimientoPendiente())
+      setError(error.message)
+    } finally {
+      pendingRef.current = false
+      setGuardando(false)
+    }
+  }
 
-    if (!movimiento) return
+  function editarCantidad(valor) {
+    if (guardando || pendiente) return
+    confirmadaRef.current = false
+    setExito(null)
+    setCantidad(valor)
+  }
 
-    setExito(movimiento)
-    setCantidad(tipo === 'entrada' ? CANTIDAD_INICIAL : movimiento.saldo)
-    } catch (error) { setError(error.message) }
-    finally { pendingRef.current = false; setGuardando(false) }
+  function editarMotivo(valor) {
+    if (guardando || pendiente) return
+    confirmadaRef.current = false
+    setExito(null)
+    setMotivo(valor)
+  }
+
+  function prepararOtro() {
+    if (guardando || pendiente) return
+    confirmadaRef.current = false
+    setExito(null)
+    setError('')
   }
 
   function cancelar() {
+    if (guardando || pendiente) return
     setCantidad(CANTIDAD_INICIAL)
     setMotivo(tipo === 'entrada' ? opciones.motivosEntrada[0] : opciones.motivosAjuste[0])
     setExito(null)
@@ -96,6 +131,7 @@ function RegistroMovimiento({
         <button
           type="button"
           role="tab"
+          disabled={guardando || Boolean(pendiente) || cargandoProducto}
           aria-selected={tipo === 'entrada'}
           className={`admin__tab${tipo === 'entrada' ? ' admin__tab--activa' : ''}`}
           onClick={() => cambiarTipo('entrada')}
@@ -105,6 +141,7 @@ function RegistroMovimiento({
         <button
           type="button"
           role="tab"
+          disabled={guardando || Boolean(pendiente) || cargandoProducto}
           aria-selected={tipo === 'ajuste'}
           className={`admin__tab${tipo === 'ajuste' ? ' admin__tab--activa' : ''}`}
           onClick={() => cambiarTipo('ajuste')}
@@ -113,16 +150,17 @@ function RegistroMovimiento({
         </button>
       </div>
 
+      {pendiente && <p className="ui__request-error" role="alert">Hay un movimiento pendiente de confirmar. Reintenta exactamente ese movimiento para consultar su resultado sin duplicarlo.</p>}
       {error && <p className="ui__request-error" role="alert">{error}</p>}
       <form className="admin__form" onSubmit={guardar}>
-        <fieldset className="ui__fieldset" disabled={guardando}>
+        <fieldset className="ui__fieldset" disabled={guardando || Boolean(pendiente) || cargandoProducto}>
         <label className="admin__campo">
           <span className="admin__campo-label">Producto</span>
           <select
             aria-label="Producto"
             ref={campoProductoRef}
             className="admin__control admin__select"
-            value={productoId}
+            value={productoActivoId}
             onChange={(evento) => elegirProducto(evento.target.value)}
           >
             {productos.map((item) => (
@@ -143,7 +181,7 @@ function RegistroMovimiento({
               min="0"
               step="1"
               value={cantidad}
-              onChange={(evento) => setCantidad(evento.target.value)}
+              onChange={(evento) => editarCantidad(evento.target.value)}
             />
           </label>
 
@@ -159,7 +197,7 @@ function RegistroMovimiento({
             className="admin__control admin__select"
             aria-label="Motivo"
             value={motivo}
-            onChange={(evento) => setMotivo(evento.target.value)}
+            onChange={(evento) => editarMotivo(evento.target.value)}
           >
             {motivos.map((opcion) => (
               <option key={opcion} value={opcion}>
@@ -174,7 +212,7 @@ function RegistroMovimiento({
           <input className="admin__control" value={session.user.nombre} readOnly />
         </label>
 
-        <div className="admin__cambio">
+        {!pendiente && <div className="admin__cambio">
           <div className="admin__cambio-valor">
             <span className="admin__cambio-numero">{stockActual}</span>
             <span className="admin__cambio-etiqueta">Stock actual</span>
@@ -190,7 +228,7 @@ function RegistroMovimiento({
               {tipo === 'entrada' ? 'Después de guardar' : 'Conteo final'}
             </span>
           </div>
-        </div>
+        </div>}
 
         {exito ? (
           <p className="admin__exito">
@@ -210,15 +248,17 @@ function RegistroMovimiento({
           </p>
         )}
 
-        <div className="admin__acciones-panel">
+        {!pendiente && <div className="admin__acciones-panel">
           <button type="button" className="ui__boton ui__boton--secundario" onClick={cancelar}>
             Cancelar
           </button>
-          <button disabled={guardando} type="submit" className="ui__boton ui__boton--primario">
-            {guardando ? 'Guardando…' : tipo === 'entrada' ? 'Guardar entrada' : 'Guardar ajuste'}
-          </button>
-        </div>
+          {exito ? <button type="button" className="ui__boton ui__boton--primario" onClick={prepararOtro}>Registrar otro movimiento</button>
+            : <button disabled={guardando} type="submit" className="ui__boton ui__boton--primario">
+              {guardando ? 'Guardando…' : tipo === 'entrada' ? 'Guardar entrada' : 'Guardar ajuste'}
+            </button>}
+        </div>}
         </fieldset>
+        {pendiente && <button disabled={guardando} type="submit" className="ui__boton ui__boton--primario">{guardando ? 'Confirmando…' : 'Confirmar movimiento pendiente'}</button>}
       </form>
     </Modal>
   )
