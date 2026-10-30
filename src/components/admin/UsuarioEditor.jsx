@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Modal from '../ui/Modal'
 import { IconInfo, IconMail, IconUser } from '../ui/icons'
 import { ROLES_USUARIO, ESTADOS_USUARIO } from '../../services/usuarios'
@@ -42,6 +42,9 @@ function UsuarioEditor({
   const [form, setForm] = useState(() => valoresIniciales(usuario))
   const [errores, setErrores] = useState({})
   const [guardado, setGuardado] = useState(false)
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
+  const pendingRef = useRef(false)
 
   const soloLectura = modo === 'ver'
 
@@ -77,14 +80,14 @@ function UsuarioEditor({
     if (!form.estado) fallos.estado = 'Selecciona un estado.'
 
     const esNuevo = modo === 'nuevo'
-    const cambioPassword = form.password.trim() !== ''
+    const cambioPassword = form.password !== ''
 
     if (esNuevo && !cambioPassword) {
       fallos.password = 'Escribe una contraseña.'
     }
     if (cambioPassword) {
-      if (form.password.trim().length < 4) {
-        fallos.password = 'La contraseña debe tener al menos 4 caracteres.'
+      if (form.password.length < 8 || new TextEncoder().encode(form.password).length > 72) {
+        fallos.password = 'La contraseña debe tener al menos 8 caracteres y como máximo 72 bytes.'
       }
       if (form.password !== form.passwordConfirm) {
         fallos.passwordConfirm = 'Las contraseñas no coinciden.'
@@ -95,9 +98,9 @@ function UsuarioEditor({
     return Object.keys(fallos).length === 0
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    if (soloLectura) return
+    if (soloLectura || pendingRef.current) return
     if (!validar()) return
 
     const cambios = {
@@ -106,12 +109,14 @@ function UsuarioEditor({
       rol: form.rol,
       estado: form.estado,
     }
-    if (form.password.trim()) {
-      cambios.password = form.password.trim()
+    if (form.password) {
+      cambios.password = form.password
     }
 
-    const ok = onGuardar(cambios)
-    if (ok) setGuardado(true)
+    pendingRef.current = true; setGuardando(true); setError('')
+    try { const ok = await onGuardar(cambios); if (ok) setGuardado(true) }
+    catch (error) { setError(error.message) }
+    finally { pendingRef.current = false; setGuardando(false) }
   }
 
   const aviso = guardado
@@ -141,14 +146,16 @@ function UsuarioEditor({
             <button
               type="submit"
               form="usuario-form"
+              disabled={guardando}
               className="ui__boton ui__boton--primario"
             >
-              {modo === 'nuevo' ? 'Crear usuario' : 'Guardar cambios'}
+              {guardando ? 'Guardando…' : modo === 'nuevo' ? 'Crear usuario' : 'Guardar cambios'}
             </button>
           )}
         </>
       }
     >
+      {error && <p className="ui__request-error" role="alert">{error}</p>}
       <form id="usuario-form" className="admin__panel-cuerpo" onSubmit={handleSubmit}>
         <div className="admin__campo">
           <label className="admin__campo-label" htmlFor="usuario-nombre">
@@ -160,7 +167,7 @@ function UsuarioEditor({
             type="text"
             value={form.nombre}
             onChange={(evento) => actualizar('nombre', evento.target.value)}
-            disabled={soloLectura}
+            disabled={soloLectura || guardando}
             aria-invalid={Boolean(errores.nombre)}
             placeholder="María García"
           />
@@ -181,7 +188,7 @@ function UsuarioEditor({
               type="email"
               value={form.email}
               onChange={(evento) => actualizar('email', evento.target.value)}
-              disabled={soloLectura}
+              disabled={soloLectura || guardando}
               aria-invalid={Boolean(errores.email)}
               placeholder="correo@dulcesabor.com"
             />
@@ -199,7 +206,7 @@ function UsuarioEditor({
               className={`admin__input admin__select-editor${errores.rol ? ' admin__input--error' : ''}`}
               value={form.rol}
               onChange={(evento) => actualizar('rol', evento.target.value)}
-              disabled={soloLectura}
+              disabled={soloLectura || guardando}
             >
               {ROLES_USUARIO.map((rol) => (
                 <option key={rol.valor} value={rol.valor}>
@@ -219,7 +226,7 @@ function UsuarioEditor({
               className={`admin__input admin__select-editor${errores.estado ? ' admin__input--error' : ''}`}
               value={form.estado}
               onChange={(evento) => actualizar('estado', evento.target.value)}
-              disabled={soloLectura}
+              disabled={soloLectura || guardando}
             >
               {ESTADOS_USUARIO.map((estado) => (
                 <option key={estado} value={estado}>
@@ -241,7 +248,7 @@ function UsuarioEditor({
             type="password"
             value={form.password}
             onChange={(evento) => actualizar('password', evento.target.value)}
-            disabled={soloLectura}
+            disabled={soloLectura || guardando}
             aria-invalid={Boolean(errores.password)}
             placeholder="••••••••"
           />
@@ -258,7 +265,7 @@ function UsuarioEditor({
             type="password"
             value={form.passwordConfirm}
             onChange={(evento) => actualizar('passwordConfirm', evento.target.value)}
-            disabled={soloLectura}
+            disabled={soloLectura || guardando}
             aria-invalid={Boolean(errores.passwordConfirm)}
             placeholder="••••••••"
           />

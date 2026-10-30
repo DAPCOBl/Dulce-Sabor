@@ -1,15 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useRef, useState } from 'react'
 import Cabecera from '../ui/Cabecera'
 import Kpi from '../ui/Kpi'
 import Toast from '../ui/Toast'
 import { useAviso } from '../ui/useAviso'
 import { IconPlus, IconUser, IconUsuarios } from '../ui/icons'
-import { useUsuarios,
+import { listarUsuarios, resumenUsuarios,
   crearUsuario,
   actualizarUsuario,
   alternarEstadoUsuario,
   eliminarUsuario,
 } from '../../services/usuarios'
+import { useRemote } from '../../hooks/useRemote'
+import RemoteStatus from '../ui/RemoteStatus'
 import UsuariosTabla from './UsuariosTabla'
 import UsuarioEditor from './UsuarioEditor'
 import '../../components/admin/admin.css'
@@ -20,7 +22,6 @@ const POR_PAGINA = 8
 const FILTROS_INICIALES = { busqueda: '', rol: '', estado: '' }
 
 function AdminUsuarios({ session }) {
-  const usuarios = useUsuarios()
   const usuarioActualId = session?.user?.id ?? null
 
   const [filtros, setFiltros] = useState(FILTROS_INICIALES)
@@ -31,40 +32,24 @@ function AdminUsuarios({ session }) {
   const [claveEditor, setClaveEditor] = useState(0)
   const [aviso, mostrarAviso] = useAviso()
 
-  const seleccionado = usuarios.find((usuario) => usuario.id === seleccionId) ?? null
-
-  const filtrados = useMemo(() => {
-    const busqueda = filtros.busqueda.trim().toLowerCase()
-
-    return usuarios.filter((usuario) => {
-      if (busqueda) {
-        const coincide =
-          usuario.nombre.toLowerCase().includes(busqueda) ||
-          usuario.email.toLowerCase().includes(busqueda)
-        if (!coincide) return false
-      }
-      if (filtros.rol && usuario.rol !== filtros.rol) return false
-      if (filtros.estado && usuario.estado !== filtros.estado) return false
-      return true
-    })
-  }, [usuarios, filtros])
-
-  const paginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA))
-  const paginaActual = Math.min(pagina, paginas)
-  const desde = filtrados.length === 0 ? 0 : (paginaActual - 1) * POR_PAGINA + 1
-  const hasta = Math.min(paginaActual * POR_PAGINA, filtrados.length)
-  const filas = filtrados.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
-
+  const remote = useRemote(async options => {
+    const [lista, resumen] = await Promise.all([
+      listarUsuarios({ ...filtros, pagina, porPagina: POR_PAGINA }, options), resumenUsuarios(options),
+    ])
+    return { ...lista, totales: resumen.resumen }
+  }, [filtros, pagina])
+  const usuarios = remote.data?.usuarios ?? []
+  const seleccionado = usuarios.find(usuario => usuario.id === seleccionId) ?? null
+  const totales = remote.data?.totales
   const hayFiltros = Boolean(filtros.busqueda || filtros.rol || filtros.estado)
-
-  const totales = useMemo(() => {
-    return {
-      total: usuarios.length,
-      admins: usuarios.filter((usuario) => usuario.rol === 'administrador').length,
-      cajeros: usuarios.filter((usuario) => usuario.rol === 'cajero').length,
-      activos: usuarios.filter((usuario) => usuario.estado === 'Activo').length,
-    }
-  }, [usuarios])
+  const [busy, setBusy] = useState(false)
+  const busyRef = useRef(false)
+  async function accion(operation, mensaje) {
+    if (busyRef.current) return
+    busyRef.current = true; setBusy(true)
+    try { await operation(); mostrarAviso(mensaje) } catch (error) { mostrarAviso(error.message) }
+    finally { busyRef.current = false; setBusy(false) }
+  }
 
   function cambiarFiltros(nuevos) {
     setFiltros(nuevos)
@@ -85,18 +70,12 @@ function AdminUsuarios({ session }) {
     setClaveEditor((clave) => clave + 1)
   }
 
-  function guardar(cambios) {
-    if (modo === 'nuevo') {
-      crearUsuario(cambios)
-      setPagina(1)
-      setPanelAbierto(false)
-      mostrarAviso('Usuario creado correctamente.')
-      return true
-    }
-
-    if (!seleccionado) return false
-    actualizarUsuario(seleccionado.id, cambios)
-    mostrarAviso('Usuario actualizado correctamente.')
+  async function guardar(cambios) {
+    if (modo === 'nuevo') await crearUsuario(cambios)
+    else if (seleccionado) await actualizarUsuario(seleccionado.id, cambios)
+    else return false
+    setPanelAbierto(false)
+    mostrarAviso('Usuario guardado correctamente.')
     return true
   }
 
@@ -113,30 +92,11 @@ function AdminUsuarios({ session }) {
   }
 
   function alternar(usuario) {
-    const ok = alternarEstadoUsuario(usuario.id)
-    if (!ok) {
-      mostrarAviso('No se puede desactivar el último administrador activo.')
-      return
-    }
-    mostrarAviso(
-      usuario.estado === 'Activo'
-        ? 'Usuario desactivado correctamente.'
-        : 'Usuario activado correctamente.',
-    )
+    void accion(() => alternarEstadoUsuario(usuario), 'Estado del usuario actualizado.')
   }
-
   function eliminar(usuario) {
-    const confirmado = window.confirm(
-      `¿Eliminar a ${usuario.nombre}? Esta acción no se puede deshacer.`,
-    )
-    if (!confirmado) return
-
-    const ok = eliminarUsuario(usuario.id, usuarioActualId)
-    if (!ok) {
-      mostrarAviso('No se pudo eliminar el usuario.')
-      return
-    }
-    mostrarAviso('Usuario eliminado correctamente.')
+    if (!window.confirm(`¿Eliminar a ${usuario.nombre}? Los usuarios con historial deben desactivarse.`)) return
+    void accion(() => eliminarUsuario(usuario.id), 'Usuario eliminado correctamente.')
   }
 
   return (
@@ -153,6 +113,8 @@ function AdminUsuarios({ session }) {
         }
       />
 
+      <RemoteStatus {...remote} />
+      {remote.data && <>
       <section className="ui__kpis ui__kpis--tres" aria-label="Indicadores de usuarios">
         <Kpi
           oscuro
@@ -192,8 +154,8 @@ function AdminUsuarios({ session }) {
 
       <div className="admin__productos-cuerpo">
         <UsuariosTabla
-          filas={filas}
-          paginacion={{ pagina: paginaActual, paginas, total: filtrados.length, desde, hasta }}
+          filas={usuarios}
+          paginacion={remote.data.paginacion}
           filtros={filtros}
           hayFiltros={hayFiltros}
           onFiltros={cambiarFiltros}
@@ -217,6 +179,8 @@ function AdminUsuarios({ session }) {
         )}
       </div>
 
+      </>}
+      {busy && <p role="status">Guardando cambios…</p>}
       <Toast mensaje={aviso} icono={<IconUser width="17" height="17" />} />
     </div>
   )

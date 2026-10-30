@@ -69,3 +69,8 @@ button {
 a {
   color: var(--terracotta);
 }
+
+.ui__remote { padding: 24px; display: grid; gap: 12px; justify-items: start; color: var(--ink-soft); }
+.ui__remote [role="alert"], .ui__request-error { color: var(--error); }
+.ui__request-error { padding: 12px 0; font-size: 14px; }
+button:disabled { cursor: not-allowed; opacity: 0.6; }
