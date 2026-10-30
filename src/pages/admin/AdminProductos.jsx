@@ -1,15 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useRef, useState } from 'react'
 import ProductoEditor from '../../components/admin/ProductoEditor'
 import ProductosTabla from '../../components/admin/ProductosTabla'
 import Cabecera from '../../components/ui/Cabecera'
 import { IconPlus } from '../../components/ui/icons'
-import { CATEGORIAS, ESTADOS } from '../../data/productos'
+import { useRemote } from '../../hooks/useRemote'
+import RemoteStatus from '../../components/ui/RemoteStatus'
 import {
   alternarEstadoProducto,
   actualizarProducto,
   crearProducto,
-  useCatalogo,
-} from '../../services/estado'
+  listarProductos,
+  opcionesProductos,
+} from '../../services/productos'
 import '../../components/admin/productos.css'
 
 const POR_PAGINA = 6
@@ -17,7 +19,6 @@ const POR_PAGINA = 6
 const FILTROS_INICIALES = { busqueda: '', categoria: '', estado: '' }
 
 function AdminProductos() {
-  const productos = useCatalogo()
   const [filtros, setFiltros] = useState(FILTROS_INICIALES)
   const [pagina, setPagina] = useState(1)
   const [seleccionId, setSeleccionId] = useState(null)
@@ -26,31 +27,23 @@ function AdminProductos() {
   const [panelAbierto, setPanelAbierto] = useState(false)
   const [claveEditor, setClaveEditor] = useState(0)
 
-  const seleccionado = productos.find((producto) => producto.id === seleccionId) ?? null
-
-  const filtrados = useMemo(() => {
-    const busqueda = filtros.busqueda.trim().toLowerCase()
-
-    return productos.filter((producto) => {
-      if (busqueda) {
-        const coincide =
-          producto.nombre.toLowerCase().includes(busqueda) ||
-          producto.sku.toLowerCase().includes(busqueda)
-        if (!coincide) return false
-      }
-      if (filtros.categoria && producto.categoria !== filtros.categoria) return false
-      if (filtros.estado && producto.estado !== filtros.estado) return false
-      return true
-    })
-  }, [productos, filtros])
-
-  const paginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA))
-  const paginaActual = Math.min(pagina, paginas)
-  const desde = filtrados.length === 0 ? 0 : (paginaActual - 1) * POR_PAGINA + 1
-  const hasta = Math.min(paginaActual * POR_PAGINA, filtrados.length)
-  const filas = filtrados.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
-
+  const remote = useRemote(async options => {
+    const [lista, opciones] = await Promise.all([
+      listarProductos({ ...filtros, pagina, porPagina: POR_PAGINA }, options), opcionesProductos(options),
+    ])
+    return { ...lista, opciones }
+  }, [filtros, pagina])
+  const productos = remote.data?.productos ?? []
+  const seleccionado = productos.find(producto => producto.id === seleccionId) ?? null
   const hayFiltros = Boolean(filtros.busqueda || filtros.categoria || filtros.estado)
+  const [error, setError] = useState('')
+  const pendingRef = useRef(false)
+  async function alternar(producto) {
+    if (pendingRef.current) return
+    pendingRef.current = true; setError('')
+    try { await alternarEstadoProducto(producto) } catch (error) { setError(error.message) }
+    finally { pendingRef.current = false }
+  }
 
   function cambiarFiltros(nuevos) {
     setFiltros(nuevos)
@@ -71,24 +64,11 @@ function AdminProductos() {
     setClaveEditor((clave) => clave + 1)
   }
 
-  function guardar(cambios) {
-    if (modo === 'nuevo') {
-      const nuevo = {
-        ...cambios,
-        id: cambios.sku.toLowerCase(),
-        stock: 0,
-        imagen: cambios.imagen,
-      }
-      crearProducto(nuevo)
-      setSeleccionId(nuevo.id)
-      setModo('editar')
-      setPagina(1)
-      setClaveEditor((clave) => clave + 1)
-      return true
-    }
-
-    if (!seleccionado) return false
-    actualizarProducto(seleccionado.id, cambios)
+  async function guardar(cambios) {
+    if (modo === 'nuevo') await crearProducto(cambios)
+    else if (seleccionado) await actualizarProducto(seleccionado.id, cambios)
+    else return false
+    setPanelAbierto(false)
     return true
   }
 
@@ -120,17 +100,19 @@ function AdminProductos() {
 
 
 
-      <div className="admin__productos-cuerpo">
+      <RemoteStatus {...remote} />
+      {error && <p className="ui__request-error" role="alert">{error}</p>}
+      {remote.data && <div className="admin__productos-cuerpo">
         <ProductosTabla
-          filas={filas}
-          paginacion={{ pagina: paginaActual, paginas, total: filtrados.length, desde, hasta }}
+          filas={productos}
+          paginacion={remote.data.paginacion}
           filtros={filtros}
-          categorias={CATEGORIAS}
+          categorias={remote.data.opciones.categorias}
           hayFiltros={hayFiltros}
           onFiltros={cambiarFiltros}
           onPagina={setPagina}
           onEditar={(producto) => abrir(producto, 'editar')}
-          onAlternar={(producto) => alternarEstadoProducto(producto.id)}
+          onAlternar={alternar}
         />
 
         {panelAbierto && (
@@ -138,15 +120,15 @@ function AdminProductos() {
             key={`${modo}-${seleccionId ?? 'nuevo'}-${claveEditor}`}
             producto={seleccionado}
             modo={modo}
-            categorias={CATEGORIAS}
-            estados={ESTADOS}
+            categorias={remote.data.opciones.categorias}
+            estados={remote.data.opciones.estados}
             catalogo={productos}
             onGuardar={guardar}
             onCancelar={cancelar}
             onCerrar={cerrar}
           />
         )}
-      </div>
+      </div>}
     </div>
   )
 }

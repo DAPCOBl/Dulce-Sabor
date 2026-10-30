@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { generarSku } from '../../services/estado'
+import { useEffect, useRef, useState } from 'react'
 import Modal from '../ui/Modal'
 import { IconInfo } from '../ui/icons'
 
@@ -13,7 +12,7 @@ function valoresIniciales(producto) {
   if (!producto) {
     return {
       nombre: '',
-      sku: generarSku('Pan dulce'),
+      sku: '',
       categoria: 'Pan dulce',
       precio: '',
       coste: '',
@@ -50,7 +49,9 @@ function ProductoEditor({
   const [form, setForm] = useState(() => valoresIniciales(producto))
   const [errores, setErrores] = useState({})
   const [guardado, setGuardado] = useState(false)
-  const [skuEditado, setSkuEditado] = useState(Boolean(producto))
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
+  const pendingRef = useRef(false)
 
   const soloLectura = modo === 'ver'
 
@@ -80,7 +81,7 @@ function ProductoEditor({
     setForm((actual) => ({
       ...actual,
       categoria,
-      sku: skuEditado ? actual.sku : generarSku(categoria),
+
     }))
   }
 
@@ -90,14 +91,14 @@ function ProductoEditor({
     const sku = form.sku.trim().toUpperCase()
 
     if (!nombre) fallos.nombre = 'Escribe el nombre del producto.'
-    if (!sku) fallos.sku = 'El SKU no puede quedar vacío.'
-    else if (catalogo.some((otro) => otro.sku.toUpperCase() === sku && otro.id !== producto?.id)) {
+    if (!sku && producto) fallos.sku = 'El SKU no puede quedar vacío.'
+    else if (sku && catalogo.some((otro) => otro.sku.toUpperCase() === sku && otro.id !== producto?.id)) {
       fallos.sku = 'Ya existe un producto con ese SKU.'
     }
-    if (!Number.isFinite(Number(form.precio)) || Number(form.precio) < 0) {
+    if (form.precio.trim() === '' || !Number.isInteger(Number(form.precio)) || Number(form.precio) < 0) {
       fallos.precio = 'Escribe un precio válido.'
     }
-    if (!Number.isFinite(Number(form.coste)) || Number(form.coste) < 0) {
+    if (form.coste.trim() === '' || !Number.isInteger(Number(form.coste)) || Number(form.coste) < 0) {
       fallos.coste = 'Escribe un coste de producción válido.'
     }
     if (!Number.isInteger(Number(form.stockMinimo)) || Number(form.stockMinimo) < 0) {
@@ -109,15 +110,18 @@ function ProductoEditor({
     return fallos
   }
 
-  function enviar(evento) {
+  async function enviar(evento) {
     evento.preventDefault()
+    if (pendingRef.current) return
     const fallos = validar()
     setErrores(fallos)
     if (Object.keys(fallos).length > 0) return
 
-    const ok = onGuardar({
+    pendingRef.current = true; setGuardando(true); setError('')
+    try {
+    const ok = await onGuardar({
       nombre: form.nombre.trim(),
-      sku: form.sku.trim().toUpperCase(),
+      ...(form.sku.trim() ? { sku: form.sku.trim().toUpperCase() } : {}),
       categoria: form.categoria,
       precio: Number(form.precio),
       coste: Number(form.coste),
@@ -128,6 +132,8 @@ function ProductoEditor({
     })
 
     if (ok) setGuardado(true)
+    } catch (error) { setError(error.message) }
+    finally { pendingRef.current = false; setGuardando(false) }
   }
 
   function cancelar() {
@@ -177,15 +183,17 @@ function ProductoEditor({
               <button
                 type="submit"
                 form="producto-formulario"
+                disabled={guardando}
                 className="ui__boton ui__boton--primario ui__boton--ancho"
               >
-                {modo === 'nuevo' ? 'Crear producto' : 'Guardar cambios'}
+                {guardando ? 'Guardando…' : modo === 'nuevo' ? 'Crear producto' : 'Guardar cambios'}
               </button>
             )}
           </div>
         </>
       }
     >
+      {error && <p className="ui__request-error" role="alert">{error}</p>}
       <form id="producto-formulario" className="admin__panel-cuerpo" onSubmit={enviar} noValidate>
         <div className="admin__campo">
           <label className="admin__campo-label" htmlFor="producto-nombre">
@@ -197,7 +205,7 @@ function ProductoEditor({
             type="text"
             value={form.nombre}
             onChange={(evento) => actualizar('nombre', evento.target.value)}
-            disabled={soloLectura}
+            disabled={soloLectura || guardando}
             aria-invalid={Boolean(errores.nombre)}
             placeholder="Pastel de chocolate"
           />
@@ -214,12 +222,11 @@ function ProductoEditor({
             type="text"
             value={form.sku}
             onChange={(evento) => {
-              setSkuEditado(true)
               actualizar('sku', evento.target.value.toUpperCase())
             }}
-            disabled={soloLectura}
+            disabled={soloLectura || guardando}
             aria-invalid={Boolean(errores.sku)}
-            placeholder="PAS-001"
+            placeholder="Automático si se deja vacío"
           />
           {errores.sku && <p className="admin__campo-error">{errores.sku}</p>}
         </div>
@@ -233,7 +240,7 @@ function ProductoEditor({
               className="admin__input admin__select-editor"
               value={form.categoria}
               onChange={(evento) => cambiarCategoria(evento.target.value)}
-              disabled={soloLectura}
+              disabled={soloLectura || guardando}
             >
               {categorias.map((categoria) => (
                 <option key={categoria} value={categoria}>
@@ -253,7 +260,7 @@ function ProductoEditor({
                 type="file"
                 accept="image/*"
                 onChange={subirImagen}
-                disabled={soloLectura}
+                disabled={soloLectura || guardando}
                 aria-invalid={Boolean(errores.imagen)}
               />
               <label htmlFor="producto-imagen" className="admin__imagen-etiqueta">
@@ -296,7 +303,7 @@ function ProductoEditor({
                 step="50"
                 value={form.precio}
                 onChange={(evento) => actualizar('precio', evento.target.value)}
-                disabled={soloLectura}
+                disabled={soloLectura || guardando}
                 aria-invalid={Boolean(errores.precio)}
                 placeholder="0"
               />
@@ -318,13 +325,21 @@ function ProductoEditor({
                 step="50"
                 value={form.coste}
                 onChange={(evento) => actualizar('coste', evento.target.value)}
-                disabled={soloLectura}
+                disabled={soloLectura || guardando}
                 aria-invalid={Boolean(errores.coste)}
                 placeholder="0"
               />
             </div>
             {errores.coste && <p className="admin__campo-error">{errores.coste}</p>}
           </div>
+        </div>
+
+        <div className="admin__campo">
+          <label className="admin__campo-label" htmlFor="producto-stock-minimo">Stock mínimo</label>
+          <input id="producto-stock-minimo" className="admin__input" type="number" min="0" step="1"
+            value={form.stockMinimo} onChange={evento => actualizar('stockMinimo', evento.target.value)}
+            disabled={soloLectura || guardando} aria-invalid={Boolean(errores.stockMinimo)} />
+          {errores.stockMinimo && <p className="admin__campo-error">{errores.stockMinimo}</p>}
         </div>
 
         <div className="admin__campo">
@@ -343,7 +358,7 @@ function ProductoEditor({
             className="admin__input admin__select-editor"
             value={form.estado}
             onChange={(evento) => actualizar('estado', evento.target.value)}
-            disabled={soloLectura}
+            disabled={soloLectura || guardando}
           >
             {estados.map((estado) => (
               <option key={estado} value={estado}>
