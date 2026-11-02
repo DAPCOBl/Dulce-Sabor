@@ -1,0 +1,29 @@
+server {
+    listen ${PORT};
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+    server_tokens off;
+
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # Los archivos generados por Vite incluyen un hash en su nombre.
+    location /assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
+    # Permite recargar rutas de la aplicación sin perder el punto de entrada.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

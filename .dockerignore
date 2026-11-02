@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+.git
+.agents
+.codex
+.aws
+.env
+.env.*
+*.local
+*.log
+.DS_Store
+.vscode
+.idea

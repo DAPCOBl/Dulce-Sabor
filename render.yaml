@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: dulce-sabor-front
+    runtime: docker
+    plan: free
+    branch: feat/deploy-render
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      - key: PORT
+        value: "10000"
